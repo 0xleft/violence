@@ -6,4 +6,11 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(violence main.cpp
         Reader.cpp
         Reader.h
+        Token.cpp
+        Token.h
+        Lexer.cpp
+        Lexer.h
+        Interpreter.cpp
+        Interpreter.h
+        utils.h
 )

@@ -1,9 +1,8 @@
 #include <iostream>
-#include "Reader.h"
+#include "Lexer.h"
 
 int main() {
-    Reader reader("example/test.vio");
-    std::cout << reader.get_content() << std::endl;
-    reader.close();
+    Lexer lexer("example/test.vio");
+    lexer.lex();
     return 0;
 }
