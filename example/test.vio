@@ -1,4 +1,5 @@
-~ code ~
+~ comment
 
-word test : "hello"
-num a : 5
+word hello_there : "hello"
+lemon a : 5
+mood b : good

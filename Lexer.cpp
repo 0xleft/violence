@@ -44,70 +44,125 @@ void Lexer::print_tokens(vector<Token> tokens) {
 vector<Token> Lexer::lex_line(string line_content, int line) {
     vector<Token> tokens;
 
-    bool is_string = false;
-    bool is_comment = false;
-    bool is_type = true;
-    bool is_identifier = false;
-    bool is_operator = false;
+    bool was_type = false;
     string token_value = "";
+    TokenType state = WHITESPACE;
 
     for (int i = 0; i < line_content.size(); i++) {
         current_char = line_content[i];
+        int column = i + 1;
 
+        // comment ~
         if (current_char == '~') {
-            is_comment = !is_comment;
+            if (state == WHITESPACE) {
+                state = COMMENT;
+            } else if (state == COMMENT) {
+                state = WHITESPACE;
+            }
         }
 
-        if (is_comment) {
-            continue;
+        // type word lemon mood once per line
+        else if ((token_value == "wor" && current_char == 'd' || token_value == "lemo" && current_char == 'n' || token_value == "moo" && current_char == 'd') && !was_type) {
+            if (state == WHITESPACE) {
+                state = TYPE;
+                was_type = true;
+            } else if (state == TYPE) {
+                continue;
+            } else if (state == COMMENT) {
+                continue;
+            } else {
+                error("While parsing type\n", "Unexpected character", line, column);
+            }
         }
 
-        if (current_char == '"') {
-            if (is_string) {
-                tokens.push_back(Token(token_value, line, i, LITERAL));
+        // string literal
+        else if (current_char == '"') {
+            if (state == WHITESPACE) {
+                state = LITERAL;
+                continue;
+            } else if (state == LITERAL) {
+                tokens.push_back(Token(token_value, line, column, state));
                 token_value = "";
+                state = WHITESPACE;
+            } else if (state == COMMENT) {
+                continue;
+            } else {
+                error("While parsing string literal\n", "Unexpected character", line, column);
             }
-            is_string = !is_string;
-            continue;
         }
 
-        if (is_string) {
-            if (i == line_content.size() - 1) {
-                error("", "Unterminated string", line, i);
+        // keywords if, (good, bad) moods, f-> to start function <-f to end function
+        else if ((token_value == "i" && current_char == 'f' || token_value == "goo" && current_char == 'd' || token_value == "ba" && current_char == 'd' || token_value == "moo" && current_char == 'd' || token_value == "f" && current_char == '-' || token_value == "-" && current_char == '>' || token_value == "<-" && current_char == 'f') && state != LITERAL && state != KEYWORD) {
+            printf("token_value: %s\n", token_value.c_str());
+            printf("current_char: %c\n", current_char);
+            printf("state: %d\n", state);
+            if (state == IDENTIFIER || state == WHITESPACE) {
+                state = KEYWORD;
+            } else if (state == COMMENT) {
+                continue;
+            } else if (state == KEYWORD) {
+                // do nothing
+            } else {
+                error("While parsing keyword\n", "Unexpected character", line, column);
             }
-            token_value += current_char;
-            continue;
         }
 
-        if (current_char == ' ' || current_char == '\t') {
-            if (token_value != "") {
-                if (is_type) {
-                    tokens.push_back(Token(token_value, line, i, TYPE));
-                    is_type = false;
-                    is_identifier = true;
-                } else if (is_identifier) {
-                    tokens.push_back(Token(token_value, line, i, IDENTIFIER));
-                    is_identifier = false;
-                }
+        // identifier
+        else if ((isalpha(current_char) || current_char == '_') && was_type && state != LITERAL && state != KEYWORD) {
+            if (state == WHITESPACE) {
+                state = IDENTIFIER;
+            } else if (state == COMMENT) {
+                continue;
+            } else if (state == IDENTIFIER) {
+                // do nothing
+            } else {
+                error("While parsing identifier\n", "Unexpected character", line, column);
+            }
+        }
+
+        // whitespace
+        else if (current_char == ' ' || current_char == '\t') {
+            if (state == WHITESPACE) {
+                continue;
+            } else if (state == COMMENT) {
+                continue;
+            } else {
+                tokens.push_back(Token(token_value, line, column, state));
                 token_value = "";
+                state = WHITESPACE;
             }
+        }
+
+        // delimiter only one in our case which is : which stands for =
+        else if (current_char == ':') {
+            if (state == WHITESPACE) {
+                state = DELIMITER;
+            } else if (state == COMMENT) {
+                continue;
+            } else {
+                tokens.push_back(Token(token_value, line, column, state));
+                token_value = "";
+                state = DELIMITER;
+            }
+        }
+
+        // operator
+        else if (current_char == '+' || current_char == '-' || current_char == '*' || current_char == '/' || current_char == '%' || current_char == '=' || current_char == '!' || current_char == '<' || current_char == '>') {
+            if (state == WHITESPACE) {
+                state = OPERATOR;
+            } else if (state == COMMENT) {
+                continue;
+            } else {
+                tokens.push_back(Token(token_value, line, column, state));
+                token_value = "";
+                state = OPERATOR;
+            }
+        }
+
+        // helper for string literal
+        if ((current_char == ' ' || current_char == '\t') && state != LITERAL) {
             continue;
         }
-
-        if (current_char == ':') {
-            if (is_type || is_identifier) {
-                error("", "Unexpected ':'", line, i);
-            }
-            tokens.push_back(Token(":", line, i, OPERATOR));
-            is_operator = true;
-            continue;
-        }
-
-        if (is_operator && i == line_content.size() - 1) {
-            error("", "Unexpected end of line", line, i);
-        }
-
-        // operator logic
 
         token_value += current_char;
     }

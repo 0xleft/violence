@@ -19,7 +19,9 @@ Keywords are:
 
 ### Special features
 
-* any statement that evaluates to a `mood` can be used as a start of an `if` statement
+* all variables are global
+* all functions return void
+* `if` a keyword can be used `if <mood>` and then the next line is executed if the mood is `good`
 * there is no recursion limit
 * there is no limit on the number of variables
 * strings can be concatenated with `+`
