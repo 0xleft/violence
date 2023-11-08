@@ -9,18 +9,13 @@
 
 using namespace std;
 
-Lexer::Lexer(string filename) {
-    this->filename = filename;
+Lexer::Lexer(string content) {
+    this->content = content;
 }
 
 vector<Token> Lexer::lex() {
-    // read the file
-    Reader reader(filename);
-    string content = reader.get_content();
-    reader.close();
-
     // split the file into lines
-    vector<string> lines = split(content, "\n");
+    vector<string> lines = split(this->content, "\n");
 
     // lex each line
     vector<Token> tokens;
@@ -28,9 +23,6 @@ vector<Token> Lexer::lex() {
         vector<Token> line_tokens = lex_line(lines[i], i);
         tokens.insert(tokens.end(), line_tokens.begin(), line_tokens.end());
     }
-
-    printf("Lexing complete\n");
-    print_tokens(tokens);
 
     return tokens;
 }
@@ -41,6 +33,7 @@ void Lexer::print_tokens(vector<Token> tokens) {
     }
 }
 
+// this should split up to make it more readable
 vector<Token> Lexer::lex_line(string line_content, int line) {
     vector<Token> tokens;
 
@@ -52,8 +45,6 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
     for (int i = 0; i < line_content.size(); i++) {
         current_char = line_content[i];
         int column = i + 1;
-
-        printf("Current char: %c\n", current_char);
 
         // comment ~
         if (current_char == '~') {
@@ -74,15 +65,12 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
             } else if (state == COMMENT) {
                 continue;
             } else {
-                error("While parsing type\n", "Unexpected character", line, column);
+                error("While parsing type", "Unexpected character", line, column);
             }
         }
 
         // string literal
         else if (current_char == '"') {
-            printf("String literal\n");
-            printf("State: %d\n", state);
-            printf("Token value: %s\n", token_value.c_str());
             if (state == WHITESPACE || token_value == "->") {
                 state = LITERAL;
                 continue;
@@ -94,7 +82,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
             } else if (state == COMMENT) {
                 continue;
             } else {
-                error("While parsing string literal\n", "Unexpected character", line, column);
+                error("While parsing string literal", "Unexpected character", line, column);
             }
         }
 
@@ -111,7 +99,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
             } else if (state == LITERAL) {
                 // do nothing
             } else {
-                error("While parsing number\n", "Unexpected character", line, column);
+                error("While parsing number", "Unexpected character", line, column);
             }
         }
 
@@ -162,7 +150,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
             } else {
                 printf("Token value: %s\n", token_value.c_str());
                 printf("State: %d\n", state);
-                error("While parsing identifier\n", "Unexpected character", line, column);
+                error("While parsing identifier", "Unexpected character", line, column);
             }
         }
 
@@ -176,7 +164,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
             } else if (state == COMMENT) {
                 continue;
             } else {
-                error("While parsing function name\n", "Unexpected character", line, column);
+                error("While parsing function name", "Unexpected character", line, column);
             }
         }
 
@@ -222,7 +210,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
 Lexer::~Lexer() = default;
 
 void Lexer::error(string trace, string message, int line, int column) {
-    printf("%s", trace.c_str());
+    printf("%s\n", trace.c_str());
     printf("ERROR: %s at line %d, column %d\n", message.c_str(), line, column);
     exit(1);
 }

@@ -8,5 +8,5 @@ if [ "$1" = "" ]; then
 fi
 
 cmake --build . --target $1 -- -j 4
-./$1
+./$1 $2
 exit 0

@@ -11,10 +11,10 @@ private:
     char current_char;
     int line;
     int column;
-    string filename;
+    string content;
 
 public:
-    Lexer(string filename);
+    Lexer(string content);
     vector<Token> lex();
     vector<Token> lex_line(string line_content, int line);
     void print_tokens(vector<Token> tokens);
