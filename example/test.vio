@@ -6,5 +6,10 @@ mood value_a : good
 
 ~ comment
 
-f-> test : test : test
+f-> fun_test : one : two :
+    ~ inside the functions
 <-f
+
+void io : fun_test->one->two ~
+
+void io : sheesh->"ls -l"

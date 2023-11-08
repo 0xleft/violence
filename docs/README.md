@@ -19,6 +19,7 @@ Keywords are:
 
 ### Special features
 
+* functions return their final statement
 * all variables are global
 * all functions return void
 * `if` a keyword can be used `if <mood>` and then the next line is executed if the mood is `good`
