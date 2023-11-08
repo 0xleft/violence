@@ -21,16 +21,13 @@ vector<Token> Lexer::lex() {
     vector<Token> tokens;
     for (int i = 0; i < lines.size(); i++) {
         vector<Token> line_tokens = lex_line(lines[i], i);
+        // add eol token
+        if (line_tokens.size() > 0)
+            line_tokens.insert(line_tokens.end(), Token("EOL", i, lines[i].size() + 1, EOL));
         tokens.insert(tokens.end(), line_tokens.begin(), line_tokens.end());
     }
 
     return tokens;
-}
-
-void Lexer::print_tokens(vector<Token> tokens) {
-    for (int i = 0; i < tokens.size(); i++) {
-        cout << tokens[i].to_string() << endl;
-    }
 }
 
 // this should split up to make it more readable

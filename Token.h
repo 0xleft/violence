@@ -1,3 +1,5 @@
+#pragma once
+
 //
 // Created by plusleft on 11/6/2023.
 //
@@ -16,6 +18,7 @@ enum TokenType {
     LITERAL, // 123.456 "abc"
     COMMENT,
     WHITESPACE,
+    EOL,
     ERROR
 };
 
@@ -27,6 +30,7 @@ private:
     TokenType type;
 
 public:
+    static void print_tokens(vector<Token> tokens);
     Token(string value, int line, int column, TokenType type);
     string get_value();
     int get_line();

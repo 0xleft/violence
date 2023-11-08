@@ -3,6 +3,7 @@
 //
 
 #include "Token.h"
+#include "iostream"
 
 Token::Token(string value, int line, int column, TokenType type) {
     this->value = value;
@@ -59,9 +60,17 @@ string Token::get_type_string() {
             return "ERROR";
         case TYPE:
             return "TYPE";
+        case EOL:
+            return "EOL";
         default:
             return "UNKNOWN";
     }
 }
 
 Token::~Token() = default;
+
+void Token::print_tokens(vector<Token> tokens) {
+    for (int i = 0; i < tokens.size(); i++) {
+        cout << tokens[i].to_string() << endl;
+    }
+}

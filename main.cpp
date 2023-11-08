@@ -1,17 +1,19 @@
 #include <iostream>
 #include "Lexer.h"
 #include "Reader.h"
+#include "Parser.h"
 
 int handle_interactive_mode() {
     // read from stdin
     string line;
+
     printf(">>> ");
     while (getline(cin, line)) {
         Lexer lexer(line);
         vector<Token> tokens = lexer.lex();
 
-        // todo
-        lexer.print_tokens(tokens);
+        Parser parser(tokens);
+        parser.parse();
 
         printf(">>> ");
     }
@@ -27,8 +29,8 @@ int handle_file_mode(char *filename) {
     Lexer lexer(content);
     vector<Token> tokens = lexer.lex();
 
-    // todo
-    lexer.print_tokens(tokens);
+    Parser parser(tokens);
+    parser.parse();
 
     return 0;
 }

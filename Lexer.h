@@ -17,7 +17,6 @@ public:
     Lexer(string content);
     vector<Token> lex();
     vector<Token> lex_line(string line_content, int line);
-    void print_tokens(vector<Token> tokens);
     void error(string trace, string message, int line, int column);
     ~Lexer();
 };
