@@ -1,5 +1,10 @@
 ~ comment
 
 word hello_there : "hello"
-lemon a : 5
-mood b : good
+lemon number : 5 + 5 - 2
+mood value_a : good
+
+~ comment
+
+f-> test : test : test
+<-f

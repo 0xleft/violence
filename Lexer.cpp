@@ -45,6 +45,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
     vector<Token> tokens;
 
     bool was_type = false;
+    bool function_start = false;
     string token_value = "";
     TokenType state = WHITESPACE;
 
@@ -84,6 +85,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
                 tokens.push_back(Token(token_value, line, column, state));
                 token_value = "";
                 state = WHITESPACE;
+                continue;
             } else if (state == COMMENT) {
                 continue;
             } else {
@@ -91,19 +93,48 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
             }
         }
 
-        // keywords if, (good, bad) moods, f-> to start function <-f to end function
-        else if ((token_value == "i" && current_char == 'f' || token_value == "goo" && current_char == 'd' || token_value == "ba" && current_char == 'd' || token_value == "moo" && current_char == 'd' || token_value == "f" && current_char == '-' || token_value == "-" && current_char == '>' || token_value == "<-" && current_char == 'f') && state != LITERAL && state != KEYWORD) {
-            printf("token_value: %s\n", token_value.c_str());
-            printf("current_char: %c\n", current_char);
-            printf("state: %d\n", state);
-            if (state == IDENTIFIER || state == WHITESPACE) {
-                state = KEYWORD;
+        // number (lemon)
+        else if (isdigit(current_char) && was_type && state != LITERAL && state != KEYWORD) {
+            if (state == WHITESPACE) {
+                state = LITERAL;
+                tokens.push_back(Token(token_value + current_char, line, column, state));
+                token_value = "";
+                state = WHITESPACE;
+                continue;
             } else if (state == COMMENT) {
                 continue;
-            } else if (state == KEYWORD) {
+            } else if (state == LITERAL) {
                 // do nothing
             } else {
-                error("While parsing keyword\n", "Unexpected character", line, column);
+                error("While parsing number\n", "Unexpected character", line, column);
+            }
+        }
+
+        // operator
+        else if (current_char == '+' || current_char == '-' || current_char == '*' || current_char == '/' || current_char == '%' || current_char == '=' || current_char == '!') {
+            if (state == WHITESPACE) {
+                state = OPERATOR;
+            } else if (state == COMMENT) {
+                continue;
+            } else {
+                tokens.push_back(Token(token_value, line, column, state));
+                token_value = "";
+                state = IDENTIFIER;
+                continue;
+            }
+        }
+
+        // keywords if, (good, bad) moods, f-> to start function <-f to end function
+        else if ((token_value == "i" && current_char == 'f' || token_value == "goo" && current_char == 'd' || token_value == "ba" && current_char == 'd' || token_value == "moo" && current_char == 'd' || token_value == "f-" && current_char == '>' || token_value == "<-" && current_char == 'f') && state != LITERAL && state != KEYWORD) {
+            if (state == COMMENT) {
+                continue;
+            } else {
+                state = KEYWORD;
+                // append to tokens
+                tokens.push_back(Token(token_value + current_char, line, column, state));
+                token_value = "";
+                state = WHITESPACE;
+                continue;
             }
         }
 
@@ -121,8 +152,9 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
         }
 
         // whitespace
-        else if (current_char == ' ' || current_char == '\t') {
+        else if (current_char == ' ' || current_char == '\t' || current_char == '\n') {
             if (state == WHITESPACE) {
+                // todo
                 continue;
             } else if (state == COMMENT) {
                 continue;
@@ -130,6 +162,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
                 tokens.push_back(Token(token_value, line, column, state));
                 token_value = "";
                 state = WHITESPACE;
+                continue;
             }
         }
 
@@ -143,19 +176,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
                 tokens.push_back(Token(token_value, line, column, state));
                 token_value = "";
                 state = DELIMITER;
-            }
-        }
-
-        // operator
-        else if (current_char == '+' || current_char == '-' || current_char == '*' || current_char == '/' || current_char == '%' || current_char == '=' || current_char == '!' || current_char == '<' || current_char == '>') {
-            if (state == WHITESPACE) {
-                state = OPERATOR;
-            } else if (state == COMMENT) {
                 continue;
-            } else {
-                tokens.push_back(Token(token_value, line, column, state));
-                token_value = "";
-                state = OPERATOR;
             }
         }
 
