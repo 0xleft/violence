@@ -15,4 +15,6 @@ add_executable(violence main.cpp
         utils.h
         Parser.cpp
         Parser.h
+        AST.cpp
+        AST.h
 )

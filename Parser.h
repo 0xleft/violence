@@ -4,6 +4,9 @@
 
 #include "Token.h"
 #include <vector>
+#include "AST.h"
+#include "Interpreter.h"
+#include <iostream>
 
 using namespace std;
 
@@ -13,28 +16,9 @@ private:
     int index;
 
 public:
-    Parser(vector<Token> tokens);
-    void parse_line(vector<Token> line_tokens, int line);
+    Parser(std::vector<Token> tokens);
+    void parse_line(std::vector<Token> line_tokens, int line);
     void error_out(string error);
     void parse();
     ~Parser();
 };
-
-class AST {
-private:
-    string value;
-    vector<AST> children;
-};
-
-class BinOp : public AST {
-private:
-    AST left;
-    Token op;
-    AST right;
-};
-
-class Num : public AST {
-private:
-    Token token;
-};
-

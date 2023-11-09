@@ -3,7 +3,6 @@
 //
 
 #include "Parser.h"
-#include <iostream>
 
 Parser::Parser(vector<Token> tokens) {
     this->tokens = tokens;
@@ -24,13 +23,23 @@ void Parser::parse() {
 
 }
 
-void Parser::parse_line(vector<Token> line_tokens, int line) {
-
-}
-
 void Parser::error_out(string error) {
     cout << "Parser Error: " << error << endl;
     exit(1);
 }
 
 Parser::~Parser() = default;
+
+void Parser::parse_line(vector<Token> line_tokens, int line) {
+    // if token is type keyword
+    printf("line: %d\n", line);
+    Token::print_tokens(line_tokens);
+
+    // safety
+    if (line_tokens.size() == 0) return;
+
+    if (line_tokens[0].get_type() == TYPE) {
+        // that means its a declaration of variable
+    }
+
+}
