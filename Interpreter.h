@@ -4,6 +4,11 @@
 // Created by plusleft on 11/6/2023.
 //
 
+#include <vector>
+#include <string>
+
+using namespace std;
+
 class Variable {
 private:
     string name;

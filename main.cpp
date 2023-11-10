@@ -6,14 +6,14 @@
 int handle_interactive_mode() {
     // read from stdin
     string line;
+    Parser parser;
 
     printf(">>> ");
     while (getline(cin, line)) {
         Lexer lexer(line);
         vector<Token> tokens = lexer.lex();
 
-        Parser parser(tokens);
-        parser.parse();
+        parser.parse(tokens);
 
         printf(">>> ");
     }
@@ -29,8 +29,8 @@ int handle_file_mode(char *filename) {
     Lexer lexer(content);
     vector<Token> tokens = lexer.lex();
 
-    Parser parser(tokens);
-    parser.parse();
+    Parser parser;
+    parser.parse(tokens);
 
     return 0;
 }

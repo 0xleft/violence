@@ -12,13 +12,13 @@ using namespace std;
 
 class Parser {
 private:
-    vector<Token> tokens;
+    Interpreter interpreter;
     int index;
 
 public:
-    Parser(std::vector<Token> tokens);
+    Parser();
     void parse_line(std::vector<Token> line_tokens, int line);
     void error_out(string error);
-    void parse();
+    void parse(std::vector<Token> tokens);
     ~Parser();
 };

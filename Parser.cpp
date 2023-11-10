@@ -4,12 +4,11 @@
 
 #include "Parser.h"
 
-Parser::Parser(vector<Token> tokens) {
-    this->tokens = tokens;
-    index = 0;
+Parser::Parser() {
+    this->interpreter = Interpreter();
 }
 
-void Parser::parse() {
+void Parser::parse(vector<Token> tokens) {
     vector<Token> line_tokens;
 
     for (Token token : tokens) {
