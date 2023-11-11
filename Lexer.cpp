@@ -54,15 +54,14 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
 
         // type word lemon mood once per line
         else if ((token_value == "wor" && current_char == 'd' || token_value == "lemo" && current_char == 'n' || token_value == "moo" && current_char == 'd' || token_value == "voi" && current_char == 'd') && !was_type) {
-            if (state == WHITESPACE) {
-                state = TYPE;
-                was_type = true;
-            } else if (state == TYPE) {
-                continue;
-            } else if (state == COMMENT) {
+            if (state == COMMENT) {
                 continue;
             } else {
-                error("While parsing type", "Unexpected character", line, column);
+                tokens.push_back(Token(token_value + current_char, line, column, TYPE));
+                token_value = "";
+                state = WHITESPACE;
+                was_type = true;
+                continue;
             }
         }
 
@@ -137,7 +136,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
         }
 
         // identifier
-        else if ((isalpha(current_char) || current_char == '_') && was_type && state != LITERAL && state != KEYWORD) {
+        else if ((isalpha(current_char) || current_char == '_') && state != LITERAL && state != KEYWORD) {
             if (state == WHITESPACE) {
                 state = IDENTIFIER;
             } else if (state == COMMENT) {
