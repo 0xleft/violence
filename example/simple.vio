@@ -1,1 +1,3 @@
-word _ : "lemon test:  " + ( ask -> "what is" )
+mood a : "good"
+word b : a ~
+word _ : "lemon test:  " + ( ask -> b ) ~
