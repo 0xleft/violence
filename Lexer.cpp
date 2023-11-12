@@ -20,7 +20,7 @@ vector<Token> Lexer::lex() {
     // lex each line
     vector<Token> tokens;
     for (int i = 0; i < lines.size(); i++) {
-        vector<Token> line_tokens = lex_line(lines[i], i);
+        vector<Token> line_tokens = lex_line(lines[i] + '\n', i);
         // add eol token
         if (line_tokens.size() > 0)
             line_tokens.insert(line_tokens.end(), Token("EOL", i, lines[i].size() + 1, EOL));
@@ -78,6 +78,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
             } else if (state == COMMENT) {
                 continue;
             } else {
+                printf("Token value: %s\n", token_value.c_str());
                 error("While parsing string literal", "Unexpected character", line, column);
             }
         }
@@ -142,6 +143,25 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
                 tokens.push_back(Token(token_value + current_char, line, column, state));
                 token_value = "";
                 state = WHITESPACE;
+                continue;
+            }
+        }
+
+        // if ( or ) set function start and function end
+        else if ((current_char == '(' || current_char == ')') && state != LITERAL_STRING && state != KEYWORD) {
+            if (state == COMMENT) {
+                continue;
+            } else {
+                if (current_char == '(') {
+                    tokens.push_back(Token("(", line, column, FUNCTION_START));
+                    token_value = "";
+                    state = WHITESPACE;
+                } else if (current_char == ')') {
+                    tokens.push_back(Token(")", line, column, FUNCTION_END));
+                    token_value = "";
+                    state = WHITESPACE;
+                }
+
                 continue;
             }
         }

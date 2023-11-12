@@ -8,13 +8,14 @@ Violence is an interpreted language that has basic types such as
 * `string` which is called `word`
 
 Keywords are:
-* `nah` which inverts the value of a `mood`
 * `good` which is a `mood` that is `true`
 * `bad` which is a `mood` that is `false`
 * `say` which prints a `word` to the console
 * `ask` which asks the user for input and stores it in a variable
-* `cya` deletes variable `use this to free memory`
+* `sheesh` which executes a shell command
 * `get` imports a file
+* `read` reads a file
+* `write` writes to a file
 * `~` makes a line a comment
 
 ### Special features

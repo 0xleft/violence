@@ -17,6 +17,8 @@ enum TokenType {
     DELIMITER, // ( ) { } [ ] , ; :
     LITERAL_STRING, // 123.456 "abc"
     LITERAL_NUMBER,
+    FUNCTION_START,
+    FUNCTION_END,
     COMMENT,
     WHITESPACE,
     EOL,

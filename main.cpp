@@ -13,7 +13,8 @@ int handle_interactive_mode() {
         Lexer lexer(line);
         vector<Token> tokens = lexer.lex();
 
-        parser.parse(tokens);
+        Variable output = parser.parse(tokens);
+        printf("%s\n", output.get_value().c_str());
 
         printf(">>> ");
     }
@@ -30,7 +31,10 @@ int handle_file_mode(char *filename) {
     vector<Token> tokens = lexer.lex();
 
     Parser parser;
-    parser.parse(tokens);
+
+    // todo
+    Variable output = parser.parse(tokens);
+    printf("%s\n", output.get_value().c_str());
 
     return 0;
 }

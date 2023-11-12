@@ -11,34 +11,6 @@
 
 using namespace std;
 
-class Function {
-private:
-    string name;
-    vector<string> arguments;
-    vector<Token> body;
-
-public:
-    Function() = default;
-
-    Function(string name, vector<string> arguments, vector<Token> body) {
-        this->name = name;
-        this->arguments = arguments;
-        this->body = body;
-    }
-
-    string get_name() {
-        return this->name;
-    }
-
-    vector<string> get_arguments() {
-        return this->arguments;
-    }
-
-    vector<Token> get_body() {
-        return this->body;
-    }
-};
-
 class Variable {
 private:
     string name;
@@ -66,6 +38,34 @@ public:
     string to_string() {
         return "Variable(" + this->name + ", " + this->type + ", " + this->value + ")";
     }
+};
+
+class Function {
+private:
+    string name;
+    vector<string> arg_names;
+    vector<Token> body;
+
+public:
+    Function(string name, string arg_names, vector<Token> body) {
+        this->name = name;
+        this->arg_names = arg_names;
+        this->body = body;
+    }
+
+    int get_arg_count() {
+        return this->arg_names.size();
+    }
+
+    vector<string> get_arg_names() {
+        return this->arg_names;
+    }
+
+    string get_name() {
+        return this->name;
+    }
+
+    Variable evaluate(vector<Variable> args);
 };
 
 class Scope {
@@ -117,10 +117,7 @@ private:
     Scope *global_scope;
     vector<Function> functions;
 public:
-    Interpreter() {
-        this->global_scope = new Scope();
-        this->functions = vector<Function>();
-    }
+    Interpreter();
 
     Scope *get_global_scope() {
         return this->global_scope;
@@ -141,7 +138,7 @@ public:
                 return function;
             }
         }
-        return Function("", vector<string>(), vector<Token>());
+        return Function("", 0, vector<Token>());
     }
 
     ~Interpreter() {
@@ -164,7 +161,7 @@ public:
         this->interpreter = interpreter;
     }
 
+    string resolve_function(vector<Token> tokens);
     string evaluate(string return_type);
     string resolve(Token token);
-    void error_out(string error);
 };

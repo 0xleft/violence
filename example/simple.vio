@@ -1,1 +1,1 @@
-word a : "aa" * 7 ~
+word _ : ( ask -> "who are you? " ) ~

@@ -12,12 +12,16 @@ using namespace std;
 class Parser {
 private:
     Interpreter *interpreter;
-    int index;
 
 public:
     Parser();
-    void parse_line(std::vector<Token> line_tokens, int line);
+    Variable parse_line(std::vector<Token> line_tokens, int line);
     void error_out(string error);
-    void parse(std::vector<Token> tokens);
+    Variable parse(std::vector<Token> tokens);
+
+    Interpreter *get_interpreter() {
+        return this->interpreter;
+    }
+
     ~Parser();
 };

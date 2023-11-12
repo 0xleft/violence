@@ -8,17 +8,22 @@ Parser::Parser() {
     this->interpreter = new Interpreter();
 }
 
-void Parser::parse(vector<Token> tokens) {
+Variable Parser::parse(vector<Token> tokens) {
     vector<Token> line_tokens;
+    Variable variable = Variable("", "", "");
+
+    bool is_function = false;
 
     for (Token token : tokens) {
         if (token.get_type() == EOL) {
-            parse_line(line_tokens, token.get_line());
+            variable = parse_line(line_tokens, token.get_line());
             line_tokens.clear();
         } else {
             line_tokens.push_back(token);
         }
     }
+
+    return variable;
 }
 
 void Parser::error_out(string error) {
@@ -30,11 +35,11 @@ Parser::~Parser() {
     delete this->interpreter;
 }
 
-void Parser::parse_line(vector<Token> line_tokens, int line) {
+Variable Parser::parse_line(vector<Token> line_tokens, int line) {
     // if token is type keyword
     printf("line: %d\n", line);
     // safety
-    if (line_tokens.size() == 0) return;
+    if (line_tokens.size() == 0) return Variable("", "", "");
 
     // type name : variable + func + literal
     if (line_tokens[0].get_type() == TYPE) {
@@ -47,10 +52,10 @@ void Parser::parse_line(vector<Token> line_tokens, int line) {
         string type = line_tokens[0].get_value();
 
         // check if variable already exists
-        Variable variable = this->interpreter->get_global_scope()->get_variable(name);
-        if (variable.get_name() != "") {
-            error_out("variable already exists");
-        }
+        // Variable variable = this->interpreter->get_global_scope()->get_variable(name);
+        // if (variable.get_name() != "") {
+        //     error_out("variable already exists");
+        // }
 
         // check if type is valid
         if (type != "word" && type != "lemon" && type != "mood" && type != "void") {
@@ -81,9 +86,7 @@ void Parser::parse_line(vector<Token> line_tokens, int line) {
         Variable new_variable = Variable(name, type, value);
         this->interpreter->get_global_scope()->set_variable(new_variable);
 
-        this->interpreter->get_global_scope()->print_variables();
-
-        Token::print_tokens(line_tokens);
+        return new_variable;
     }
 
     if (line_tokens[0].get_type() == IDENTIFIER) {
