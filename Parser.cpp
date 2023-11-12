@@ -13,10 +13,17 @@ Variable Parser::parse(vector<Token> tokens) {
     Variable variable = Variable("", "", "");
 
     bool is_function = false;
+    bool skipping = false;
 
     for (Token token : tokens) {
-        if (token.get_type() == EOL) {
+        if (token.get_type() == EOL && !skipping) {
             variable = parse_line(line_tokens, token.get_line());
+            line_tokens.clear();
+            if (variable.get_type() == "skip") {
+                skipping = true;
+            }
+        } else if (token.get_type() == EOL && skipping) {
+            skipping = false;
             line_tokens.clear();
         } else {
             line_tokens.push_back(token);
@@ -38,6 +45,7 @@ Parser::~Parser() {
 Variable Parser::parse_line(vector<Token> line_tokens, int line) {
     // if token is type keyword
     // printf("line: %d\n", line);
+    // Token::print_tokens(line_tokens);
     // safety
     if (line_tokens.size() == 0) return Variable("", "", "");
 
@@ -89,7 +97,34 @@ Variable Parser::parse_line(vector<Token> line_tokens, int line) {
 
         return new_variable;
     } else if (line_tokens[0].get_type() == KEYWORD) {
-        // that means its a keyword
+        if (line_tokens[0].get_value() == "if") {
+            // if false then skip the next line
+            // if true then execute the next line
+
+            // check if expression is true
+            vector<Token> expression_tokens;
+
+            for (int i = 1; i < line_tokens.size(); i++) {
+                if (line_tokens[i].get_type() == EOL) {
+                    break;
+                } else {
+                    expression_tokens.push_back(line_tokens[i]);
+                }
+            }
+
+            if (expression_tokens.size() == 0) {
+                error_out("if statement must have an expression");
+            }
+
+            Expression expression = Expression(expression_tokens, "mood", this->interpreter);
+            string value = expression.evaluate("mood");
+
+            if (value == "bad") {
+                return Variable("", "skip", "");
+            } else {
+                return Variable("", "execute", "");
+            }
+        }
     }
 
     return Variable("", "", "");

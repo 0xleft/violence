@@ -34,7 +34,6 @@ int handle_file_mode(char *filename) {
 
     // todo
     Variable output = parser.parse(tokens);
-    printf("%s\n", output.get_value().c_str());
 
     return 0;
 }

@@ -1,3 +1,8 @@
+word _ : ( say -> "hello world" ) ~
+
 mood a : "good"
 word b : a ~
-word _ : "lemon test:  " + ( ask -> b ) ~
+
+
+if 5 % 2 == 1 ~
+word _ : ( say -> "what is life? " ) ~
