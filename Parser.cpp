@@ -92,7 +92,5 @@ Variable Parser::parse_line(vector<Token> line_tokens, int line) {
         // that means its a keyword
     }
 
-
-
     return Variable("", "", "");
 }
