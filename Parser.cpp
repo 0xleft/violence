@@ -37,7 +37,7 @@ Parser::~Parser() {
 
 Variable Parser::parse_line(vector<Token> line_tokens, int line) {
     // if token is type keyword
-    printf("line: %d\n", line);
+    // printf("line: %d\n", line);
     // safety
     if (line_tokens.size() == 0) return Variable("", "", "");
 

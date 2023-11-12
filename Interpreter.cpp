@@ -308,10 +308,17 @@ string Expression::resolve_function(vector<Token> tokens) {
     int arg_index = 0;
     for (int i = 0; i < tokens.size(); i++) {
         Token token = tokens[i];
-        if (token.get_type() == OPERATOR) {
+        if (token.get_type() == OPERATOR && token.get_value() == "->") {
             // resolve arg
             string arg_value = resolve(tokens[i + 1]);
-            Variable arg = Variable(arg_names[arg_index], "word", arg_value);
+            Variable arg = Variable("", "", "");
+            if (tokens[i + 1].get_type() == LITERAL_STRING) {
+                arg = Variable(arg_names[arg_index], "word", arg_value);
+            } else if (tokens[i + 1].get_type() == LITERAL_NUMBER) {
+                arg = Variable(arg_names[arg_index], "lemon", arg_value);
+            } else if (tokens[i + 1].get_type() == IDENTIFIER) {
+                arg = Variable(arg_names[arg_index], this->interpreter->get_global_scope()->get_variable(tokens[i + 1].get_value()).get_type(), arg_value);
+            }
             args.push_back(arg);
             arg_index++;
             arg_tokens = vector<Token>();
@@ -319,6 +326,11 @@ string Expression::resolve_function(vector<Token> tokens) {
             arg_tokens.push_back(token);
         }
     }
+
+    // debug
+    // for (Variable arg : args) {
+    //     cout << arg.get_name() << " " << arg.get_value() << endl;
+    // }
 
     // resolve function
     Variable output = function.evaluate(args);

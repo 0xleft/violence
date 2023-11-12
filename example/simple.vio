@@ -1,1 +1,5 @@
-word _ : "hello " + ( ask -> "who are you? " )
+word b : "hello there"
+word a : " violence!"
+
+word _ : "welcome " + ( ask -> b ) + " to the world of" + a
+
