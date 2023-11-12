@@ -44,17 +44,25 @@ class Function {
 private:
     string name;
     vector<string> arg_names;
+    int arg_count;
     vector<Token> body;
 
 public:
-    Function(string name, string arg_names, vector<Token> body) {
+    Function(string name, vector<string> arg_names, vector<Token> body) {
         this->name = name;
         this->arg_names = arg_names;
+        this->arg_count = arg_names.size();
+        this->body = body;
+    }
+
+    Function(string name, int arg_count, vector<Token> body) {
+        this->name = name;
+        this->arg_count = arg_count;
         this->body = body;
     }
 
     int get_arg_count() {
-        return this->arg_names.size();
+        return this->arg_count;
     }
 
     vector<string> get_arg_names() {

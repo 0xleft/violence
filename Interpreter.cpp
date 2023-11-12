@@ -31,7 +31,7 @@ Interpreter::Interpreter() {
 }
 
 Variable Function::evaluate(vector<Variable> args) {
-    if (args.size() != this->arg_count) {
+    if (args.size() != this->get_arg_count()) {
         error_out("invalid number of arguments");
     }
 
@@ -239,25 +239,14 @@ string Expression::resolve_function(vector<Token> tokens) {
 
     // get function
     Function function = this->interpreter->get_function(function_name);
+    vector<string> arg_names = function.get_arg_names();
 
     // get args
     vector<Variable> args = vector<Variable>();
     vector<Token> arg_tokens = vector<Token>();
 
-    for (int i = 3; i < tokens.size() - 1; i++) {
-        Token token = tokens[i];
-        TokenType type = token.get_type();
-        string value = token.get_value();
+    // args
 
-        if (type == OPERATOR) {
-            // resolve arg
-            Variable variable = Variable(
-            args.push_back(variable);
-            arg_tokens = vector<Token>();
-        } else {
-            arg_tokens.push_back(token);
-        }
-    }
 
     // resolve function
     Variable output = function.evaluate(args);
