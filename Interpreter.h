@@ -45,20 +45,25 @@ private:
     string name;
     vector<string> arg_names;
     int arg_count;
+    string return_type;
     vector<Token> body;
 
 public:
-    Function(string name, vector<string> arg_names, vector<Token> body) {
+    Function(string name, vector<string> arg_names, vector<Token> body, string return_type) {
         this->name = name;
         this->arg_names = arg_names;
         this->arg_count = arg_names.size();
         this->body = body;
     }
 
-    Function(string name, int arg_count, vector<Token> body) {
+    Function(string name, int arg_count, vector<Token> body, string return_type) {
         this->name = name;
         this->arg_count = arg_count;
+        for (int i = 0; i < arg_count; i++) {
+            this->arg_names.push_back("arg" + to_string(i));
+        }
         this->body = body;
+        this->return_type = return_type;
     }
 
     int get_arg_count() {
@@ -67,6 +72,14 @@ public:
 
     vector<string> get_arg_names() {
         return this->arg_names;
+    }
+
+    vector<Token> get_body() {
+        return this->body;
+    }
+
+    string get_return_type() {
+        return this->return_type;
     }
 
     string get_name() {
@@ -146,7 +159,7 @@ public:
                 return function;
             }
         }
-        return Function("", 0, vector<Token>());
+        return Function("", 0, vector<Token>(), "void");
     }
 
     ~Interpreter() {

@@ -51,6 +51,7 @@ Variable Parser::parse_line(vector<Token> line_tokens, int line) {
         string name = line_tokens[1].get_value();
         string type = line_tokens[0].get_value();
 
+        // not really
         // check if variable already exists
         // Variable variable = this->interpreter->get_global_scope()->get_variable(name);
         // if (variable.get_name() != "") {
@@ -87,15 +88,11 @@ Variable Parser::parse_line(vector<Token> line_tokens, int line) {
         this->interpreter->get_global_scope()->set_variable(new_variable);
 
         return new_variable;
-    }
-
-    if (line_tokens[0].get_type() == IDENTIFIER) {
-        // that means its a function call or variable assignment
-    }
-
-    if (line_tokens[0].get_type() == KEYWORD) {
+    } else if (line_tokens[0].get_type() == KEYWORD) {
         // that means its a keyword
     }
+
+
 
     return Variable("", "", "");
 }

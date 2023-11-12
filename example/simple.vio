@@ -1,1 +1,1 @@
-word _ : ( ask -> "who are you? " ) ~
+word _ : "hello " + ( ask -> "who are you? " ) ~

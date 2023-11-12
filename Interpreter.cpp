@@ -22,12 +22,12 @@ Interpreter::Interpreter() {
     // add built in functions
     // ask, say, sheesh get read write
 
-    this->functions.push_back(Function("ask", 1, vector<Token>()));
-    this->functions.push_back(Function("say", 1, vector<Token>()));
-    this->functions.push_back(Function("sheesh", 1, vector<Token>()));
-    this->functions.push_back(Function("get", 1, vector<Token>()));
-    this->functions.push_back(Function("read", 1, vector<Token>()));
-    this->functions.push_back(Function("write", 2, vector<Token>()));
+    this->functions.push_back(Function("ask", 1, vector<Token>(), "word"));
+    this->functions.push_back(Function("say", 1, vector<Token>(), "void"));
+    this->functions.push_back(Function("sheesh", 1, vector<Token>(), "word"));
+    this->functions.push_back(Function("get", 1, vector<Token>(), "void"));
+    this->functions.push_back(Function("read", 1, vector<Token>(), "word"));
+    this->functions.push_back(Function("write", 2, vector<Token>(), "void"));
 }
 
 Variable Function::evaluate(vector<Variable> args) {
@@ -96,10 +96,20 @@ Variable Function::evaluate(vector<Variable> args) {
     return output;
 }
 
+int count_function_calls(vector<Token> tokens) {
+    int count = 0;
+    for (Token token : tokens) {
+        if (token.get_type() == FUNCTION_START) {
+            count++;
+        }
+    }
+    return count;
+}
+
 string Expression::evaluate(string return_type) {
     vector<Token> tokens = this->tokens;
 
-    Token::print_tokens(tokens);
+    // Token::print_tokens(tokens);
 
     // check return type is valid
     if (return_type != "word" && return_type != "lemon" && return_type != "mood" && return_type != "void") {
@@ -108,6 +118,57 @@ string Expression::evaluate(string return_type) {
 
     if (tokens[0].get_type() == OPERATOR) {
         error_out("expression cannot start with operator");
+    }
+
+    // resolve function calls and replace with return value token
+    // function call ( name -> arg1 -> arg2 )
+    // but could also be ( name -> ( name -> arg1 -> arg2 ) -> arg2 )
+    // so we need to resolve the inner function first
+    while (count_function_calls(tokens) != 0) {
+        // walk through tokens when you find ( look for ) if you find ( again then start over till we find function with ( and ) which means it is inner most function
+        // then resolve that function and replace it with the return value
+        // then start over
+
+        // find first function call
+        int start_index = -1;
+        int end_index = -1;
+
+        for (int i = 0; i < tokens.size(); i++) {
+            Token token = tokens[i];
+            if (token.get_type() == FUNCTION_START) {
+                start_index = i + 1;
+            } else if (token.get_type() == FUNCTION_END) {
+                end_index = i - 1;
+                break;
+            }
+        }
+
+        if (start_index == -1 || end_index == -1) {
+            error_out("invalid function call");
+        }
+
+        // print tokens in that range
+        vector<Token> function_tokens = vector<Token>();
+        for (int i = start_index; i <= end_index; i++) {
+            function_tokens.push_back(tokens[i]);
+        }
+
+        // resolve function
+        string function_value = resolve_function(function_tokens);
+
+        // replace function call with return value
+        vector<Token> new_tokens = vector<Token>();
+
+        for (int i = 0; i < tokens.size(); i++) {
+            Token token = tokens[i];
+            if (i == start_index - 1) {
+                new_tokens.push_back(Token(function_value, token.get_line(), token.get_column(), LITERAL_STRING));
+            } else if (i < start_index || i > end_index) {
+                new_tokens.push_back(token);
+            }
+        }
+
+        tokens = new_tokens;
     }
 
     string final_value = resolve(tokens[0]);
@@ -226,16 +287,14 @@ string Expression::evaluate(string return_type) {
 }
 
 string Expression::resolve_function(vector<Token> tokens) {
-    // function is ( name -> arg1 -> arg2 )
+    // function is name -> arg1 -> arg2
     // tokens:
-    //Token((, 0, 10, FUNCTION_START)
     //Token(ask, 0, 15, IDENTIFIER)
     //Token(->, 0, 18, OPERATOR)
     //Token(who are you? , 0, 33, LITERAL_STRING)
-    //Token(), 0, 35, FUNCTION_END)
 
     // get function name
-    string function_name = tokens[1].get_value();
+    string function_name = tokens[0].get_value();
 
     // get function
     Function function = this->interpreter->get_function(function_name);
@@ -246,7 +305,20 @@ string Expression::resolve_function(vector<Token> tokens) {
     vector<Token> arg_tokens = vector<Token>();
 
     // args
-
+    int arg_index = 0;
+    for (int i = 0; i < tokens.size(); i++) {
+        Token token = tokens[i];
+        if (token.get_type() == OPERATOR) {
+            // resolve arg
+            string arg_value = resolve(tokens[i + 1]);
+            Variable arg = Variable(arg_names[arg_index], "word", arg_value);
+            args.push_back(arg);
+            arg_index++;
+            arg_tokens = vector<Token>();
+        } else {
+            arg_tokens.push_back(token);
+        }
+    }
 
     // resolve function
     Variable output = function.evaluate(args);
