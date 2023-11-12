@@ -25,8 +25,39 @@ string Expression::evaluate(string return_type) {
     final_value = resolve(tokens[0]);
 
     if (return_type == "word") {
+        // string operations
+
+        for (int i = 1; i < tokens.size(); i++) {
+            Token token = tokens[i];
+            TokenType type = token.get_type();
+            string value = token.get_value();
+
+            if (type == OPERATOR) {
+                string next_value = resolve(tokens[i + 1]);
+
+                if (value == "+") {
+                    final_value += next_value;
+                } else if (value == "-") {
+                    final_value = final_value.substr(0, final_value.size() - std::stoi(next_value));
+                } else if (value == "*") {
+                    string new_value = "";
+                    for (int i = 0; i < std::stoi(next_value); i++) {
+                        new_value += final_value;
+                    }
+                    final_value = new_value;
+                } else if (value == "/") {
+                    final_value = final_value.substr(0, final_value.size() / std::stoi(next_value));
+                } else if (value == "%") {
+                    final_value = final_value.substr(std::stoi(next_value), final_value.size());
+                } else if (value == "^") {
+                    final_value = final_value.substr(0, std::stoi(next_value));
+                }
+            }
+        }
 
     } else if (return_type == "lemon") {
+        // math operations
+
         for (int i = 1; i < tokens.size(); i++) {
             Token token = tokens[i];
             TokenType type = token.get_type();
