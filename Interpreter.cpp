@@ -142,7 +142,7 @@ string Expression::evaluate(string return_type) {
                 break;
             }
         }
-
+        
         if (start_index == -1 || end_index == -1) {
             error_out("invalid function call");
         }
@@ -162,8 +162,10 @@ string Expression::evaluate(string return_type) {
         for (int i = 0; i < tokens.size(); i++) {
             Token token = tokens[i];
             if (i == start_index - 1) {
-                new_tokens.push_back(Token(function_value, token.get_line(), token.get_column(), LITERAL_STRING));
-            } else if (i < start_index || i > end_index) {
+                // replace function call with return value
+                new_tokens.push_back(Token(function_value, 0, 0, LITERAL_STRING));
+                i = end_index + 1;
+            } else {
                 new_tokens.push_back(token);
             }
         }
