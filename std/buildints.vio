@@ -1,5 +1,0 @@
-f-> read : filename
-<-f
-
-f-> write : filename : content
-<-f
