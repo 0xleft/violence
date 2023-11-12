@@ -15,7 +15,8 @@ enum TokenType {
     IDENTIFIER, // variable name
     OPERATOR, // + - * / % = == != < > <= >=
     DELIMITER, // ( ) { } [ ] , ; :
-    LITERAL, // 123.456 "abc"
+    LITERAL_STRING, // 123.456 "abc"
+    LITERAL_NUMBER,
     COMMENT,
     WHITESPACE,
     EOL,

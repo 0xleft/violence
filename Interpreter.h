@@ -6,8 +6,38 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
+#include "Token.h"
 
 using namespace std;
+
+class Function {
+private:
+    string name;
+    vector<string> arguments;
+    vector<Token> body;
+
+public:
+    Function() = default;
+
+    Function(string name, vector<string> arguments, vector<Token> body) {
+        this->name = name;
+        this->arguments = arguments;
+        this->body = body;
+    }
+
+    string get_name() {
+        return this->name;
+    }
+
+    vector<string> get_arguments() {
+        return this->arguments;
+    }
+
+    vector<Token> get_body() {
+        return this->body;
+    }
+};
 
 class Variable {
 private:
@@ -32,16 +62,44 @@ public:
     string get_value() {
         return this->value;
     }
+
+    string to_string() {
+        return "Variable(" + this->name + ", " + this->type + ", " + this->value + ")";
+    }
 };
 
 class Scope {
 private:
     vector<Variable> variables;
 public:
-    Scope() = default;
+    Scope() {
+        this->variables = vector<Variable>();
+    }
 
-    void add_variable(Variable variable) {
-        this->variables.push_back(variable);
+    void set_variable(Variable variable) {
+        // check if variable exists
+        if (this->get_variable(variable.get_name()).get_name() == "") {
+            this->variables.push_back(variable);
+            return;
+        }
+
+        // if it does, replace it
+        for (int i = 0; i < this->variables.size(); i++) {
+            if (this->variables[i].get_name() == variable.get_name()) {
+                this->variables[i] = variable;
+                return;
+            }
+        }
+    }
+
+    void print_variable_count() {
+        cout << "variable count: " << this->variables.size() << endl;
+    }
+
+    void print_variables() {
+        for (Variable variable : this->variables) {
+            cout << variable.get_name() << "->type->" << variable.get_type() << "->value->" << variable.get_value() << endl;
+        }
     }
 
     Variable get_variable(string name) {
@@ -56,26 +114,57 @@ public:
 
 class Interpreter {
 private:
-    vector<Scope> scopes;
+    Scope *global_scope;
+    vector<Function> functions;
 public:
-    Interpreter() = default;
-
-    void add_scope(Scope scope) {
-        this->scopes.push_back(scope);
+    Interpreter() {
+        this->global_scope = new Scope();
+        this->functions = vector<Function>();
     }
 
-    Scope get_scope(int index) {
-        return this->scopes[index];
+    Scope *get_global_scope() {
+        return this->global_scope;
     }
 
-    Variable get_variable(string name) {
-        for (int i = this->scopes.size() - 1; i >= 0; i--) {
-            Scope scope = this->scopes[i];
-            Variable variable = scope.get_variable(name);
-            if (variable.get_name() != "") {
-                return variable;
+    vector<Function> get_functions() {
+        return this->functions;
+    }
+
+    // functions
+    void add_function(Function function) {
+        this->functions.push_back(function);
+    }
+
+    Function get_function(string name) {
+        for (Function function : this->functions) {
+            if (function.get_name() == name) {
+                return function;
             }
         }
-        return Variable("", "", "");
+        return Function("", vector<string>(), vector<Token>());
     }
+
+    ~Interpreter() {
+        delete this->global_scope;
+    }
+};
+
+class Expression {
+private:
+    vector<Token> tokens;
+    string type;
+    Interpreter *interpreter;
+
+public:
+    Expression() = default;
+
+    Expression(vector<Token> tokens, string type, Interpreter *interpreter) {
+        this->tokens = tokens;
+        this->type = type;
+        this->interpreter = interpreter;
+    }
+
+    string evaluate(string return_type);
+    string resolve(Token token);
+    void error_out(string error);
 };
