@@ -51,7 +51,54 @@ string Expression::evaluate(string return_type) {
             }
         }
     } else if (return_type == "mood") {
-        // boolean operations
+        // boolean operations good == true, bad == false
+        for (int i = 1; i < tokens.size(); i++) {
+            Token token = tokens[i];
+            TokenType type = token.get_type();
+            string value = token.get_value();
+
+            if (type == OPERATOR) {
+                string next_value = resolve(tokens[i + 1]);
+
+                if (value == "==") {
+                    if (final_value == next_value) {
+                        final_value = "good";
+                    } else {
+                        final_value = "bad";
+                    }
+                } else if (value == "!=") {
+                    if (final_value != next_value) {
+                        final_value = "good";
+                    } else {
+                        final_value = "bad";
+                    }
+                } else if (value == ">") {
+                    if (std::stoi(final_value) > std::stoi(next_value)) {
+                        final_value = "good";
+                    } else {
+                        final_value = "bad";
+                    }
+                } else if (value == "<") {
+                    if (std::stoi(final_value) < std::stoi(next_value)) {
+                        final_value = "good";
+                    } else {
+                        final_value = "bad";
+                    }
+                } else if (value == ">=") {
+                    if (std::stoi(final_value) >= std::stoi(next_value)) {
+                        final_value = "good";
+                    } else {
+                        final_value = "bad";
+                    }
+                } else if (value == "<=") {
+                    if (std::stoi(final_value) <= std::stoi(next_value)) {
+                        final_value = "good";
+                    } else {
+                        final_value = "bad";
+                    }
+                }
+            }
+        }
     } else if (return_type == "void") {
         // void operations
     }

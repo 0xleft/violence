@@ -101,16 +101,26 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
         }
 
         // operator
-        else if ((current_char == '+' || current_char == '-' || current_char == '*' || current_char == '/' || current_char == '%' || current_char == '=' || current_char == '!') && state != LITERAL_STRING && state != KEYWORD) {
+        else if ((current_char == '+'
+        || current_char == '-'
+        || current_char == '*'
+        || current_char == '/'
+        || current_char == '%'
+        || current_char == '='
+        || current_char == '!'
+        || current_char == '>'
+        || current_char == '<'
+        || current_char == '^'
+        || current_char == '&'
+        || current_char == '|'
+        ) && state != LITERAL_STRING && state != KEYWORD) {
             if (state == WHITESPACE) {
                 state = OPERATOR;
+                token_value += current_char;
+                continue;
             } else if (state == COMMENT) {
                 continue;
             } else {
-                tokens.push_back(Token(token_value, line, column, state));
-                token_value = "";
-                state = WHITESPACE;
-                continue;
             }
         }
 

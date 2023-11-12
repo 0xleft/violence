@@ -80,6 +80,10 @@ void Parser::parse_line(vector<Token> line_tokens, int line) {
         // add variable to scope
         Variable new_variable = Variable(name, type, value);
         this->interpreter->get_global_scope()->set_variable(new_variable);
+
+        this->interpreter->get_global_scope()->print_variables();
+
+        Token::print_tokens(line_tokens);
     }
 
     if (line_tokens[0].get_type() == IDENTIFIER) {
