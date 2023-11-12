@@ -80,13 +80,12 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
             } else if (state == COMMENT) {
                 continue;
             } else {
-                printf("Token value: %s\n", token_value.c_str());
                 error("While parsing string literal", "Unexpected character", line, column);
             }
         }
 
         // number (lemon)
-        else if (isdigit(current_char) && was_type && state != LITERAL_STRING && state != KEYWORD || current_char == '.' && was_type && state != LITERAL_STRING && state != KEYWORD) {
+        else if (isdigit(current_char) && state != LITERAL_STRING && state != KEYWORD || current_char == '.' && was_type && state != LITERAL_STRING && state != KEYWORD) {
             if (state == WHITESPACE) {
                 state = LITERAL_NUMBER;
                 // tokens.push_back(Token(token_value + current_char, line, column, state));

@@ -4,5 +4,13 @@ mood a : "good"
 word b : a ~
 
 
-if 5 % 2 == 1 ~
-word _ : ( say -> "what is life? " ) ~
+lemon number : ( ask -> "what is life? " ) ~
+word a : number ~
+word _ : ( say -> a ) ~
+lemon answer : number % 2 ~
+word answer : answer ~
+word _ : ( say -> answer ) ~
+if answer == 0 ~
+word _ : ( say -> "even" ) ~
+if answer != 0 ~
+word _ : ( say -> "odd" ) ~
