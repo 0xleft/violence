@@ -1,5 +1,4 @@
 word b : "hello there"
 word a : " violence!"
 
-word _ : "welcome " + ( ask -> b ) + " to the world of" + a
-
+word _ : "welcome " + ( ask -> b ) + ( ask -> a ) + " to the party!"
