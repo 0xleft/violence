@@ -1,16 +1,4 @@
-word _ : ( say -> "hello world" ) ~
+lemon a : ( ask -> "enter a number" ) % 2
 
-mood a : "good"
-word b : a ~
-
-
-lemon number : ( ask -> "what is life? " ) ~
-word a : number ~
-word _ : ( say -> a ) ~
-lemon answer : number % 2 ~
-word answer : answer ~
-word _ : ( say -> answer ) ~
-if answer == 0 ~
-word _ : ( say -> "even" ) ~
-if answer != 0 ~
-word _ : ( say -> "odd" ) ~
+if a == 0 ~
+word _ : ( say -> "even" )

@@ -28,6 +28,7 @@ Interpreter::Interpreter() {
     this->functions.push_back(Function("get", 1, vector<Token>(), "void"));
     this->functions.push_back(Function("read", 1, vector<Token>(), "word"));
     this->functions.push_back(Function("write", 2, vector<Token>(), "void"));
+    this->functions.push_back(Function("exit", 0, vector<Token>(), "void"));
 }
 
 Variable Function::evaluate(vector<Variable> args) {
@@ -35,7 +36,7 @@ Variable Function::evaluate(vector<Variable> args) {
         error_out("invalid number of arguments");
     }
 
-    vector<string> special_functions = {"ask", "say", "sheesh", "get", "read", "write"};
+    vector<string> special_functions = {"ask", "say", "sheesh", "get", "read", "write", "exit"};
 
     // if special function
     if (std::find(special_functions.begin(), special_functions.end(), this->name) != special_functions.end()) {
@@ -83,6 +84,10 @@ Variable Function::evaluate(vector<Variable> args) {
             // write
             // todo
             return Variable("output", "void", "");
+        } else if (this->name == "exit") {
+            // exit
+            // todo
+            exit(0);
         }
     }
 
