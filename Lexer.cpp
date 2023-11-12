@@ -215,7 +215,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
         }
 
         // delimiter only one in our case which is : which stands for =
-        else if (current_char == ':') {
+        else if (current_char == ':' && state != LITERAL_STRING) {
             if (state == COMMENT) {
                 continue;
             } else {

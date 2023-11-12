@@ -1,4 +1,1 @@
-word b : "hello there"
-word a : " violence!"
-
-word _ : "welcome " + ( ask -> b ) + ( ask -> a ) + " to the party!"
+word _ : "lemon test:  " + ( ask -> "what is" )

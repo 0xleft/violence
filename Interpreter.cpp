@@ -142,7 +142,7 @@ string Expression::evaluate(string return_type) {
                 break;
             }
         }
-        
+
         if (start_index == -1 || end_index == -1) {
             error_out("invalid function call");
         }
