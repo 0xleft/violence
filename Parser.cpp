@@ -39,13 +39,13 @@ Variable Parser::parse(vector<Token> tokens) {
             // get body
             bool found_start = false;
             for (int i = 0; i < tokens.size(); i++) {
-                if (tokens[i].get_type() == KEYWORD && tokens[i].get_value() == "f->") {
+                if (line_tokens[i].get_type() == KEYWORD && line_tokens[i].get_value() == "f->") {
                     found_start = true;
                     continue;
-                } else if (tokens[i].get_type() == KEYWORD && tokens[i].get_value() == "<-f") {
+                } else if (line_tokens[i].get_type() == KEYWORD && line_tokens[i].get_value() == "<-f") {
                     break;
                 } else if (found_start) {
-                    body.push_back(tokens[i]);
+                    body.push_back(line_tokens[i]);
                 }
             }
 

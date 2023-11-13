@@ -1,13 +1,15 @@
+f-> mod -> number -> mod_number -> lemon
+    lemon output : number % mod_number
+<-f
+
 f-> fizzbuzz -> count -> max_count -> void
     lemon count = count + 1
     word output = ""
 
-    lemon temp = count % 3
-    if temp == 0
+    if ( mod -> count -> 3 ) == 0
     word output = output + "fizz"
 
-    lemon temp = count % 5
-    if temp == 0
+    if ( mod -> count -> 5 ) == 0
     word output = output + "buzz"
 
     word temp = count

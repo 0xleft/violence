@@ -373,10 +373,9 @@ string Expression::resolve_function(vector<Token> tokens) {
     // for (Variable arg : args) {
     //     cout << arg.get_name() << " " << arg.get_value() << endl;
     // }
-
-    for (FunctionSymlink symlink : symlinks) {
-        cout << symlink.get_name() << " " << symlink.get_original_name() << endl;
-    }
+    // for (FunctionSymlink symlink : symlinks) {
+    //     cout << symlink.get_name() << " " << symlink.get_original_name() << endl;
+    // }
 
     // resolve function
     Variable output = function.evaluate(args, this->interpreter->get_functions(), symlinks);
