@@ -21,6 +21,37 @@ Variable Parser::parse(vector<Token> tokens) {
             is_function = true;
         }
         if (token.get_type() == KEYWORD && token.get_value() == "<-f") {
+            line_tokens.push_back(token);
+            string name = line_tokens[1].get_value();
+            vector<string> arg_names;
+            vector<Token> body;
+            // could have many args so return type is last before the first EOL
+            string return_type;
+            for (int i = 3; i < line_tokens.size(); i++) {
+                if (line_tokens[i].get_type() == EOL) {
+                    return_type = line_tokens[i - 1].get_value();
+                    break;
+                } else if (line_tokens[i].get_type() == IDENTIFIER) {
+                    arg_names.push_back(line_tokens[i].get_value());
+                }
+            }
+
+            // get body
+            bool found_start = false;
+            for (int i = 0; i < tokens.size(); i++) {
+                if (tokens[i].get_type() == KEYWORD && tokens[i].get_value() == "f->") {
+                    found_start = true;
+                    continue;
+                } else if (tokens[i].get_type() == KEYWORD && tokens[i].get_value() == "<-f") {
+                    break;
+                } else if (found_start) {
+                    body.push_back(tokens[i]);
+                }
+            }
+
+            Function function = Function(name, arg_names, body, return_type);
+            this->interpreter->add_function(function);
+
             is_function = false;
         }
 

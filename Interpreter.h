@@ -11,6 +11,11 @@
 
 using namespace std;
 
+class Interpreter;
+class Variable;
+class Function;
+class Scope;
+
 class Variable {
 private:
     string name;
@@ -54,6 +59,7 @@ public:
         this->arg_names = arg_names;
         this->arg_count = arg_names.size();
         this->body = body;
+        this->return_type = return_type;
     }
 
     Function(string name, int arg_count, vector<Token> body, string return_type) {
@@ -86,7 +92,7 @@ public:
         return this->name;
     }
 
-    Variable evaluate(vector<Variable> args);
+    Variable evaluate(vector<Variable> args, Interpreter *interpreter);
 };
 
 class Scope {
@@ -150,7 +156,19 @@ public:
 
     // functions
     void add_function(Function function) {
-        this->functions.push_back(function);
+        // check if function exists
+        if (this->get_function(function.get_name()).get_name() == "") {
+            this->functions.push_back(function);
+            return;
+        }
+
+        // if it does, replace it
+        for (int i = 0; i < this->functions.size(); i++) {
+            if (this->functions[i].get_name() == function.get_name()) {
+                this->functions[i] = function;
+                return;
+            }
+        }
     }
 
     Function get_function(string name) {

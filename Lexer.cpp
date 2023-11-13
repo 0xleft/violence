@@ -40,7 +40,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
     string token_value = "";
     TokenType state = WHITESPACE;
 
-    line_content += " ~";
+    line_content += " ~ ";
 
     for (int i = 0; i < line_content.size(); i++) {
         current_char = line_content[i];

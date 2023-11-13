@@ -31,7 +31,7 @@ Interpreter::Interpreter() {
     this->functions.push_back(Function("exit", 0, vector<Token>(), "void"));
 }
 
-Variable Function::evaluate(vector<Variable> args) {
+Variable Function::evaluate(vector<Variable> args, Interpreter* interpreter) {
     if (args.size() != this->get_arg_count()) {
         error_out("invalid number of arguments");
     }
@@ -95,6 +95,11 @@ Variable Function::evaluate(vector<Variable> args) {
     Parser parser = Parser();
     for (Variable variable : args) {
         parser.get_interpreter()->get_global_scope()->set_variable(variable);
+    }
+
+    // functions
+    for (Function function : interpreter->get_functions()) {
+        parser.get_interpreter()->add_function(function);
     }
 
     Variable output = parser.parse(this->body);
@@ -310,6 +315,10 @@ string Expression::resolve_function(vector<Token> tokens) {
 
     // get function
     Function function = this->interpreter->get_function(function_name);
+    if (function.get_name() == "") {
+        error_out("function \"" + function_name + "\" does not exist");
+    }
+
     vector<string> arg_names = function.get_arg_names();
 
     // get args
@@ -345,7 +354,7 @@ string Expression::resolve_function(vector<Token> tokens) {
     // }
 
     // resolve function
-    Variable output = function.evaluate(args);
+    Variable output = function.evaluate(args, this->interpreter);
     return output.get_value();
 }
 
