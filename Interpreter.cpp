@@ -45,7 +45,7 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
             if (args[0].get_type() != "word") {
                 error_out("ask only accepts word type");
             }
-            cout << args[0].get_value() << endl;
+            cout << args[0].get_value();
             string input;
             getline(cin, input);
             return Variable("input", "word", input);
@@ -54,7 +54,7 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
             if (args[0].get_type() != "word") {
                 error_out("say only accepts word type");
             }
-            cout << args[0].get_value() << endl;
+            cout << args[0].get_value() + "\n";
             return Variable("output", "void", "");
         } else if (this->name == "sheesh") {
             // sheesh
@@ -123,8 +123,6 @@ int count_function_calls(vector<Token> tokens) {
 
 string Expression::evaluate(string return_type) {
     vector<Token> tokens = this->tokens;
-
-    // Token::print_tokens(tokens);
 
     // check return type is valid
     if (return_type != "word" && return_type != "lemon" && return_type != "mood" && return_type != "void") {

@@ -139,6 +139,7 @@ Variable Parser::parse_line(vector<Token> line_tokens, int line) {
         return new_variable;
     } else if (line_tokens[0].get_type() == KEYWORD) {
         if (line_tokens[0].get_value() == "if") {
+            // Token::print_tokens(line_tokens);
             // if false then skip the next line
             // if true then execute the next line
 

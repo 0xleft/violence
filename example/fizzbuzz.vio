@@ -1,0 +1,24 @@
+f-> fizzbuzz -> count -> max_count -> void
+    lemon count = count + 1
+    word output = ""
+
+    lemon temp = count % 3
+    if temp == 0
+    word output = output + "fizz"
+
+    lemon temp = count % 5
+    if temp == 0
+    word output = output + "buzz"
+
+    word temp = count
+    if output == ""
+    ( say -> temp )
+
+    if output != ""
+    ( say -> output )
+
+    if count <= max_count
+    ( fizzbuzz -> count -> max_count )
+<-f
+
+( fizzbuzz -> 0 -> 200 )
