@@ -12,7 +12,7 @@ f-> fizzbuzz -> count -> max_count -> void
     if ( mod -> count -> 5 ) == 0
     word output = output + "buzz"
 
-    word temp = count
+    word temp : count
     if output == ""
     ( say -> temp )
 
