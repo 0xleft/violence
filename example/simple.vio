@@ -1,9 +1,9 @@
-f-> test -> range -> void ~
-lemon range : range - 1 ~
-word i : range ~
-word _ : ( say -> i ) ~
-if range > 0 ~
-( test -> range ) ~
+f-> test -> range -> void
+    lemon range : range - 1
+    word i : range
+    word _ : ( say -> i )
+    if range > 0
+        ( test -> range )
 <-f
 
-( test -> 10 ) ~
+( test -> 10 )

@@ -20,7 +20,21 @@ vector<Token> Lexer::lex() {
     // lex each line
     vector<Token> tokens;
     for (int i = 0; i < lines.size(); i++) {
-        vector<Token> line_tokens = lex_line(lines[i] + '\n', i);
+        if (lines[i].size() == 0) {
+            continue;
+        }
+        if (lines[i][lines[i].size() - 1] == '\r') {
+            lines[i].erase(lines[i].size() - 1);
+        }
+        // last letter
+        if (lines[i][lines[i].size() - 1] != '~') {
+            // dont really like this it should automatically add it
+            lines[i] += " ~";
+        }
+
+        // printf("Line: %s\n", lines[i].c_str());
+        vector<Token> line_tokens = lex_line(lines[i], i);
+        // print last letter
         // add eol token
         if (line_tokens.size() > 0)
             line_tokens.insert(line_tokens.end(), Token("EOL", i, lines[i].size() + 1, EOL));
@@ -40,19 +54,13 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
     string token_value = "";
     TokenType state = WHITESPACE;
 
-    line_content += " ~ ";
-
     for (int i = 0; i < line_content.size(); i++) {
         current_char = line_content[i];
         int column = i + 1;
 
         // comment ~
         if (current_char == '~') {
-            if (state == WHITESPACE) {
-                state = COMMENT;
-            } else if (state == COMMENT) {
-                state = WHITESPACE;
-            }
+            state = COMMENT;
         }
 
         // type word lemon mood once per line
