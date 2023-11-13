@@ -1,9 +1,12 @@
 name: Build and publish
 
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["master"]
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -16,13 +19,12 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential cmake
           cmake .
-          ./run.sh -- release
+          chmod +x run.sh
+          ./run.sh violence release
       - name: Publish to GitHub Releases
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             violence
             install.sh
-          tag_name: ${{ github.ref }}
-          body: |
-            ${{ github.event.head_commit.message }}
