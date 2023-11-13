@@ -30,7 +30,8 @@ vector<Token> Lexer::lex() {
     return tokens;
 }
 
-// this should split up to make it more readable
+// this should be made so it splits on space and then lex each word
+// but maybe later
 vector<Token> Lexer::lex_line(string line_content, int line) {
     vector<Token> tokens;
 
@@ -85,7 +86,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
         }
 
         // number (lemon)
-        else if (isdigit(current_char) && state != LITERAL_STRING && state != KEYWORD || current_char == '.' && was_type && state != LITERAL_STRING && state != KEYWORD) {
+        else if (isdigit(current_char) && state != LITERAL_STRING && state != KEYWORD || current_char == '.' && state != LITERAL_STRING && state != KEYWORD) {
             if (state == WHITESPACE) {
                 state = LITERAL_NUMBER;
                 // tokens.push_back(Token(token_value + current_char, line, column, state));
@@ -99,6 +100,28 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
                 // do nothing
             } else {
                 error("While parsing number", "Unexpected character", line, column);
+            }
+        }
+
+        // keywords if, (good, bad) moods, f-> to start function <-f to end function, ask, say, sheesh (shell commands), get (import)
+        else if ((token_value == "i" && current_char == 'f'
+                  || token_value == "f-" && current_char == '>'
+                  || token_value == "<-" && current_char == 'f'
+                 ) && state != LITERAL_STRING && state != KEYWORD) {
+            if (state == COMMENT) {
+                continue;
+            } else {
+                if (token_value == "f-" && current_char == '>') {
+                    function_start = true;
+                } else if (token_value == "<-" && current_char == 'f') {
+                    function_start = false;
+                }
+                state = KEYWORD;
+                // append to tokens
+                tokens.push_back(Token(token_value + current_char, line, column, state));
+                token_value = "";
+                state = WHITESPACE;
+                continue;
             }
         }
 
@@ -123,28 +146,6 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
             } else if (state == COMMENT) {
                 continue;
             } else {
-            }
-        }
-
-        // keywords if, (good, bad) moods, f-> to start function <-f to end function, ask, say, sheesh (shell commands), get (import)
-        else if ((token_value == "i" && current_char == 'f'
-        || token_value == "f-" && current_char == '>'
-        || token_value == "<-" && current_char == 'f'
-                ) && state != LITERAL_STRING && state != KEYWORD) {
-            if (state == COMMENT) {
-                continue;
-            } else {
-                if (token_value == "f-" && current_char == '>') {
-                    function_start = true;
-                } else if (token_value == "<-" && current_char == 'f') {
-                    function_start = false;
-                }
-                state = KEYWORD;
-                // append to tokens
-                tokens.push_back(Token(token_value + current_char, line, column, state));
-                token_value = "";
-                state = WHITESPACE;
-                continue;
             }
         }
 

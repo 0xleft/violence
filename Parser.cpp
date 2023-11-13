@@ -16,7 +16,17 @@ Variable Parser::parse(vector<Token> tokens) {
     bool skipping = false;
 
     for (Token token : tokens) {
-        if (token.get_type() == EOL && !skipping) {
+
+        if (token.get_type() == KEYWORD && token.get_value() == "f->") {
+            is_function = true;
+        }
+        if (token.get_type() == KEYWORD && token.get_value() == "<-f") {
+            is_function = false;
+        }
+
+        if (is_function) {
+            line_tokens.push_back(token);
+        } else if (token.get_type() == EOL && !skipping) {
             variable = parse_line(line_tokens, token.get_line());
             line_tokens.clear();
             if (variable.get_type() == "skip") {
@@ -125,6 +135,11 @@ Variable Parser::parse_line(vector<Token> line_tokens, int line) {
                 return Variable("", "execute", "");
             }
         }
+    } else if (line_tokens[0].get_type() == FUNCTION_START) {
+        Expression expression = Expression(line_tokens, "void", this->interpreter);
+        expression.evaluate("void");
+
+        return Variable("", "execute", "");
     }
 
     return Variable("", "", "");

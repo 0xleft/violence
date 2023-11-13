@@ -222,6 +222,13 @@ string Expression::evaluate(string return_type) {
             if (type == OPERATOR) {
                 string next_value = resolve(tokens[i + 1]);
 
+                // check if parsable to int or float
+                try {
+                    std::stoi(final_value);
+                } catch (const std::invalid_argument& ia) {
+                    error_out("invalid number");
+                }
+
                 if (value == "+") {
                     final_value = std::to_string(std::stof(final_value) + std::stof(next_value));
                 } else if (value == "-") {
@@ -286,8 +293,6 @@ string Expression::evaluate(string return_type) {
                 }
             }
         }
-    } else if (return_type == "void") {
-        // none just execute
     }
 
     return final_value;

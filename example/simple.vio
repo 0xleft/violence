@@ -1,4 +1,5 @@
-lemon a : ( ask -> "enter a number" ) % 2
+f-> test
+word _ : ( say -> "test2" )
+<-f
 
-if a == 0 ~
-word _ : ( say -> "even" )
+( test )
