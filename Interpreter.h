@@ -15,6 +15,7 @@ class Interpreter;
 class Variable;
 class Function;
 class Scope;
+class FunctionSymlink;
 
 class Variable {
 private:
@@ -92,7 +93,7 @@ public:
         return this->name;
     }
 
-    Variable evaluate(vector<Variable> args, Interpreter *interpreter);
+    Variable evaluate(vector<Variable> args, vector<Function> functions, vector<FunctionSymlink> function_symlinks);
 };
 
 class Scope {
@@ -139,10 +140,32 @@ public:
     }
 };
 
+// make more useful
+class FunctionSymlink {
+private:
+    string name;
+    string original_name;
+
+public:
+    FunctionSymlink(string name, string original_name) {
+        this->name = name;
+        this->original_name = original_name;
+    }
+
+    string get_name() {
+        return this->name;
+    }
+
+    string get_original_name() {
+        return this->original_name;
+    }
+};
+
 class Interpreter {
 private:
     Scope *global_scope;
     vector<Function> functions;
+    vector<FunctionSymlink> function_symlinks;
 public:
     Interpreter();
 
@@ -154,8 +177,45 @@ public:
         return this->functions;
     }
 
+    void set_function_symlink(FunctionSymlink function_symlink) {
+        // check if function exists
+        if (this->get_function(function_symlink.get_name()).get_name() != "") {
+            cout << "function with name " << function_symlink.get_name() << " already exists while trying to name function after it :(" << endl;
+            exit(1);
+        }
+
+        // check if function symlink exists
+        if (this->get_function_symlink(function_symlink.get_name()).get_name() == "") {
+            this->function_symlinks.push_back(function_symlink);
+            return;
+        }
+
+        // if it does, replace it
+        for (int i = 0; i < this->function_symlinks.size(); i++) {
+            if (this->function_symlinks[i].get_name() == function_symlink.get_name()) {
+                this->function_symlinks[i] = function_symlink;
+                return;
+            }
+        }
+    }
+
+    FunctionSymlink get_function_symlink(string name) {
+        for (FunctionSymlink function_symlink : this->function_symlinks) {
+            if (function_symlink.get_name() == name) {
+                return function_symlink;
+            }
+        }
+        return FunctionSymlink("", "");
+    }
+
     // functions
     void add_function(Function function) {
+        // check if variable with this name exits
+        if (this->get_global_scope()->get_variable(function.get_name()).get_name() != "") {
+            cout << "variable with name " << function.get_name() << " already exists while trying to name function after it :(" << endl;
+            exit(1);
+        }
+
         // check if function exists
         if (this->get_function(function.get_name()).get_name() == "") {
             this->functions.push_back(function);
@@ -177,6 +237,13 @@ public:
                 return function;
             }
         }
+
+        // check if function symlink exists
+        FunctionSymlink function_symlink = this->get_function_symlink(name);
+        if (function_symlink.get_name() != "") {
+            return this->get_function(function_symlink.get_original_name());
+        }
+
         return Function("", 0, vector<Token>(), "void");
     }
 

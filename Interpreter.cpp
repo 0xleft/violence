@@ -31,7 +31,7 @@ Interpreter::Interpreter() {
     this->functions.push_back(Function("exit", 0, vector<Token>(), "void"));
 }
 
-Variable Function::evaluate(vector<Variable> args, Interpreter* interpreter) {
+Variable Function::evaluate(vector<Variable> args, vector<Function> functions, vector<FunctionSymlink> symlinks) {
     if (args.size() != this->get_arg_count()) {
         error_out("invalid number of arguments");
     }
@@ -98,8 +98,13 @@ Variable Function::evaluate(vector<Variable> args, Interpreter* interpreter) {
     }
 
     // functions
-    for (Function function : interpreter->get_functions()) {
+    for (Function function : functions) {
         parser.get_interpreter()->add_function(function);
+    }
+
+    // symlinks
+    for (FunctionSymlink symlink : symlinks) {
+        parser.get_interpreter()->set_function_symlink(symlink);
     }
 
     Variable output = parser.parse(this->body);
@@ -316,6 +321,11 @@ string Expression::resolve_function(vector<Token> tokens) {
     // get function
     Function function = this->interpreter->get_function(function_name);
     if (function.get_name() == "") {
+        if (this->interpreter->get_function_symlink(function_name).get_name() != "") {
+            function_name = this->interpreter->get_function_symlink(function_name).get_original_name();
+            function = this->interpreter->get_function(function_name);
+        }
+
         error_out("function \"" + function_name + "\" does not exist");
     }
 
@@ -325,11 +335,24 @@ string Expression::resolve_function(vector<Token> tokens) {
     vector<Variable> args = vector<Variable>();
     vector<Token> arg_tokens = vector<Token>();
 
+    vector<FunctionSymlink> symlinks = vector<FunctionSymlink>();
+
     // args
     int arg_index = 0;
     for (int i = 0; i < tokens.size(); i++) {
         Token token = tokens[i];
         if (token.get_type() == OPERATOR && token.get_value() == "->") {
+            if (this->interpreter->get_function(tokens[i + 1].get_value()).get_name() != "") {
+                // add empty arg
+                args.push_back(Variable(arg_names[arg_index], "skip", ""));
+                // add symlink
+                FunctionSymlink symlink = FunctionSymlink(arg_names[arg_index], tokens[i + 1].get_value());
+                symlinks.push_back(symlink);
+
+                arg_index++;
+                continue;
+            }
+
             // resolve arg
             string arg_value = resolve(tokens[i + 1]);
             Variable arg = Variable("", "", "");
@@ -353,8 +376,12 @@ string Expression::resolve_function(vector<Token> tokens) {
     //     cout << arg.get_name() << " " << arg.get_value() << endl;
     // }
 
+    for (FunctionSymlink symlink : symlinks) {
+        cout << symlink.get_name() << " " << symlink.get_original_name() << endl;
+    }
+
     // resolve function
-    Variable output = function.evaluate(args, this->interpreter);
+    Variable output = function.evaluate(args, this->interpreter->get_functions(), symlinks);
     return output.get_value();
 }
 
