@@ -7,6 +7,7 @@
 #include <string>
 #include "Parser.h"
 #include <algorithm>
+#include "Reader.h"
 
 using namespace std;
 
@@ -65,17 +66,21 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
             cout << "sheesh" << endl;
             return Variable("output", "void", "");
         } else if (this->name == "get") {
-            // get
-            // todo
+            // import another violence file
+            // basicaly just parse the file and add the functions to the interpreter
+            //todo
             return Variable("input", "word", args[0].get_value());
+
         } else if (this->name == "read") {
             // one arg is filename
             if (args[0].get_type() != "word") {
                 error_out("read only accepts word type");
             }
-            // read
-            // todo
-            return Variable("input", "word", args[0].get_value());
+            Reader reader = Reader(args[0].get_value());
+            string content = reader.get_content();
+            reader.close();
+
+            return Variable("output", "word", content);
         } else if (this->name == "write") {
             // two args filename and content
             if (args[0].get_type() != "word" || args[1].get_type() != "word") {
