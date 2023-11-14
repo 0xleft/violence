@@ -4,7 +4,7 @@
 >
 > This is the official documentation for violence (.vio) programming language
 >
-> It is licensed under GPLv3 license
+> It is licensed under MIT license
 
 ## Violence Language (.vio)
 
