@@ -89,6 +89,10 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
             string content = reader.get_content();
             reader.close();
 
+            if (content == "") {
+                error_out("file \"" + args[0].get_value() + "\" does not exist or is empty");
+            }
+
             Parser parser = Parser();
             Lexer lexer = Lexer(content);
             vector<Token> tokens = lexer.lex();
@@ -122,12 +126,15 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
             if (args[0].get_type() != "word" || args[1].get_type() != "word") {
                 error_out("write only accepts word type");
             }
-            // write
-            // todo
+
+            Reader reader = Reader(args[0].get_value());
+            reader.write(args[1].get_value());
+            reader.close();
+
             return Variable("output", "void", "");
         } else if (this->name == "exit") {
             // exit
-            // todo
+            printf("Exiting...\n");
             exit(0);
         }
     }

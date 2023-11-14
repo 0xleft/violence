@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include "Reader.h"
+#include "fstream"
 
 using namespace std;
 
@@ -18,8 +19,15 @@ Reader::Reader(std::string filename) {
             content += line + "\n";
         }
     } else {
-        cout << "Error opening file " << filename << endl;
+        // cout << "Error opening file " << filename << endl;
     }
+}
+
+void Reader::write(string content) {
+    ofstream file;
+    file.open(filename);
+    file << content;
+    file.close();
 }
 
 void Reader::close() {
