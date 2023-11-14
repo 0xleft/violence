@@ -1,12 +1,6 @@
 # Violence
 
-A programming language built for fun which comes with a few quirky features :D
-
-## Example
-
-```violence
-
-```
+A functional first programming language with limited types and basic features.
 
 ## Docs
 
