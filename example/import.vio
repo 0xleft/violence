@@ -1,5 +1,3 @@
 ( get -> "example/simple.vio" )
 
 ( test )
-
-( write -> "test.txt" -> "hello there" )
