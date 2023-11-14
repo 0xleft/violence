@@ -27,6 +27,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            configs/linux/violence_linux
-            configs/win_64/violence_win_64.exe
+            bin/*
             install.sh

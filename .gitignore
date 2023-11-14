@@ -14,3 +14,5 @@ violence
 cmake-build-debug
 configs/win_64/violence_win_64.exe
 configs/linux/violence_linux
+violence_linux
+violence_win_64.exe
