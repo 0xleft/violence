@@ -6,20 +6,24 @@
 >
 > It is licensed under MIT license
 
-## Violence Language (.vio)
+## Table of contents
 
-|            Section    |Description                          |Link                         |
-|----------------|-------------------------------|-----------------------------|
-|Basics|`Test`            |[Basic docs](basics.md)            |
-|Examples|`Test`            |[Example docs](examples.md)            |
-|Functions|`Test`            |[Function docs](functions.md)            |
-|Variables|`Test`            |[Variable docs](variables.md)            |
+From here you can navigate to the different sections of the documentation.
+
+### Violence Language (.vio)
+
+| Section   | Description                     | Link                      |
+|-----------|---------------------------------|---------------------------|
+| Basics    | `Basics of the language`        | [Basics](basics.md)       |
+| Examples  | `Some examples`                 | [Examples](examples.md)   |
+| Functions | `More in depth about functions` | [Functions](functions.md) |
+| Variables | `More in depth about variables` | [Variables](variables.md) |
 
 
-## Interpreter
+### Interpreter
 
-|            Section    |Description                          |Link                         |
-|----------------|-------------------------------|-----------------------------|
-|Lexer|`Test`            |[Lexer docs](lexer.md)            |
-|Parser|`Test`            |[Parser docs](parser.md)            |
-|Interpreter|`Test`            |[Interpreter docs](interpreter.md)            |
+| Section     | Description                        | Link                               |
+|-------------|------------------------------------|------------------------------------|
+| Lexer       | `The lexical parser for files`     | [Lexer docs](lexer.md)             |
+| Parser      | `Parses tokens`                    | [Parser docs](parser.md)           |
+| Interpreter | `Interprets expressions and stuff` | [Interpreter docs](interpreter.md) |
