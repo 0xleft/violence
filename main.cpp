@@ -14,8 +14,13 @@ int handle_interactive_mode() {
         vector<Token> tokens = lexer.lex();
 
         Variable output = parser.parse(tokens);
-        printf("%s\n", output.get_value().c_str());
 
+        if (output.get_value() == "") {
+            printf(">>> ");
+            continue;
+        }
+
+        printf("%s\n", output.get_value().c_str());
         printf(">>> ");
     }
 
