@@ -1,5 +1,1 @@
-f-> test -> fun -> void
-( fun -> "asking" )
-<-f
-
-( test -> ask )
+( say -> ( sheesh -> "ls -la" ) )

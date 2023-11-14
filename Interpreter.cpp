@@ -32,6 +32,19 @@ Interpreter::Interpreter() {
     this->functions.push_back(Function("exit", 0, vector<Token>(), "void"));
 }
 
+string exec(string cmd) {
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    string result = "";
+    while(!feof(pipe)) {
+        if(fgets(buffer, 128, pipe) != NULL)
+            result += buffer;
+    }
+    pclose(pipe);
+    return result;
+}
+
 Variable Function::evaluate(vector<Variable> args, vector<Function> functions, vector<FunctionSymlink> symlinks) {
     if (args.size() != this->get_arg_count()) {
         error_out("invalid number of arguments");
@@ -63,8 +76,9 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
             if (args[0].get_type() != "word") {
                 error_out("sheesh only accepts word type");
             }
-            cout << "sheesh" << endl;
-            return Variable("output", "void", "");
+
+            string output = exec(args[0].get_value());
+            return Variable("output", "word", output);
         } else if (this->name == "get") {
             // import another violence file
             // basicaly just parse the file and add the functions to the interpreter
