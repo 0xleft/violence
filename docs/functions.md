@@ -1,5 +1,7 @@
 # Functions (more in depth)
 
+## Builtin functions
+
 ### say
 
 Print to stdout
