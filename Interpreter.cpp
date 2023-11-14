@@ -8,6 +8,7 @@
 #include "Parser.h"
 #include <algorithm>
 #include "Reader.h"
+#include "Lexer.h"
 
 using namespace std;
 
@@ -45,7 +46,7 @@ string exec(string cmd) {
     return result;
 }
 
-Variable Function::evaluate(vector<Variable> args, vector<Function> functions, vector<FunctionSymlink> symlinks) {
+Variable Function::evaluate(vector<Variable> args, vector<Function> functions, vector<FunctionSymlink> symlinks, Interpreter *interpreter) {
     if (args.size() != this->get_arg_count()) {
         error_out("invalid number of arguments");
     }
@@ -82,9 +83,30 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
         } else if (this->name == "get") {
             // import another violence file
             // basicaly just parse the file and add the functions to the interpreter
-            //todo
-            return Variable("input", "word", args[0].get_value());
 
+            // get
+            Reader reader = Reader(args[0].get_value());
+            string content = reader.get_content();
+            reader.close();
+
+            Parser parser = Parser();
+            Lexer lexer = Lexer(content);
+            vector<Token> tokens = lexer.lex();
+            parser.parse(tokens);
+
+            // get all the functions and add them to the interpreter
+            vector<Function> functions = parser.get_interpreter()->get_functions();
+            for (Function function : functions) {
+                interpreter->add_function(function);
+            }
+
+            // get all the symlinks and add them to the interpreter
+            vector<FunctionSymlink> symlinks = parser.get_interpreter()->get_symlinks();
+            for (FunctionSymlink symlink : symlinks) {
+                interpreter->set_function_symlink(symlink);
+            }
+
+            return Variable("output", "void", "");
         } else if (this->name == "read") {
             // one arg is filename
             if (args[0].get_type() != "word") {
@@ -326,6 +348,7 @@ string Expression::evaluate(string return_type) {
 }
 
 string Expression::resolve_function(vector<Token> tokens) {
+    //Token::print_tokens(tokens);
     // function is name -> arg1 -> arg2
     // tokens:
     //Token(ask, 0, 15, IDENTIFIER)
@@ -359,7 +382,19 @@ string Expression::resolve_function(vector<Token> tokens) {
     for (int i = 0; i < tokens.size(); i++) {
         Token token = tokens[i];
         if (token.get_type() == OPERATOR && token.get_value() == "->") {
-            if (this->interpreter->get_function(tokens[i + 1].get_value()).get_name() != "") {
+            string arg_value = resolve(tokens[i + 1]);
+            // resolve variables before functions :)
+            Variable arg = Variable("", "", "");
+            if (tokens[i + 1].get_type() == LITERAL_STRING) {
+                arg = Variable(arg_names[arg_index], "word", arg_value);
+            } else if (tokens[i + 1].get_type() == LITERAL_NUMBER) {
+                arg = Variable(arg_names[arg_index], "lemon", arg_value);
+            } else if (tokens[i + 1].get_type() == IDENTIFIER) {
+                arg = Variable(arg_names[arg_index], this->interpreter->get_global_scope()->get_variable(tokens[i + 1].get_value()).get_type(), arg_value);
+            }
+
+            // check if arg is function but only if arg is not a variable
+            if (this->interpreter->get_function(tokens[i + 1].get_value()).get_name() != "" && arg.get_name() == "") {
                 // add empty arg
                 args.push_back(Variable(arg_names[arg_index], "skip", ""));
                 // add symlink
@@ -370,16 +405,6 @@ string Expression::resolve_function(vector<Token> tokens) {
                 continue;
             }
 
-            // resolve arg
-            string arg_value = resolve(tokens[i + 1]);
-            Variable arg = Variable("", "", "");
-            if (tokens[i + 1].get_type() == LITERAL_STRING) {
-                arg = Variable(arg_names[arg_index], "word", arg_value);
-            } else if (tokens[i + 1].get_type() == LITERAL_NUMBER) {
-                arg = Variable(arg_names[arg_index], "lemon", arg_value);
-            } else if (tokens[i + 1].get_type() == IDENTIFIER) {
-                arg = Variable(arg_names[arg_index], this->interpreter->get_global_scope()->get_variable(tokens[i + 1].get_value()).get_type(), arg_value);
-            }
             args.push_back(arg);
             arg_index++;
             arg_tokens = vector<Token>();
@@ -397,7 +422,7 @@ string Expression::resolve_function(vector<Token> tokens) {
     // }
 
     // resolve function
-    Variable output = function.evaluate(args, this->interpreter->get_functions(), symlinks);
+    Variable output = function.evaluate(args, this->interpreter->get_functions(), symlinks, this->interpreter);
     return output.get_value();
 }
 

@@ -93,7 +93,7 @@ public:
         return this->name;
     }
 
-    Variable evaluate(vector<Variable> args, vector<Function> functions, vector<FunctionSymlink> function_symlinks);
+    Variable evaluate(vector<Variable> args, vector<Function> functions, vector<FunctionSymlink> function_symlinks, Interpreter *interpreter);
 };
 
 class Scope {
@@ -245,6 +245,10 @@ public:
         }
 
         return Function("", 0, vector<Token>(), "void");
+    }
+
+    vector<FunctionSymlink> get_symlinks() {
+        return this->function_symlinks;
     }
 
     ~Interpreter() {

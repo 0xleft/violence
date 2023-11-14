@@ -1,1 +1,3 @@
-( say -> ( sheesh -> "ls -la" ) )
+f-> test -> void
+( say -> "test" )
+<-f
