@@ -1,5 +1,13 @@
 # Basics
 
+Indentations are not required but are cool 😎
+
+> **Remember**
+>
+> Use spaces everywhere else lexer will pass out and die (until I rewrite it :)
+>
+> If it is throwing some weird error it is probably **BECAUSE YOU DIDNT ADD SPACES DAMNIT**
+
 ## Hello World
 
 ```vio
@@ -46,3 +54,10 @@ f-> function_name -> argument1 -> argument2 -> argument3 -> void
 
 ## If statements
 
+If statement evaluates boolean expression and if it is true then it executes the next line else it skips it.
+
+```vio
+mood a : "good"
+if a != "bad"
+( say -> "a is good" )
+```

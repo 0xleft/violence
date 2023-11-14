@@ -8,7 +8,13 @@
 
 ## Table of contents
 
+> **Note**
+>
+> To build from source: [see this](building.md)
+
 From here you can navigate to the different sections of the documentation.
+
+## Sections
 
 ### Violence Language (.vio)
 
