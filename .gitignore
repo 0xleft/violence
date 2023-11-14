@@ -12,3 +12,5 @@ _deps
 .idea
 violence
 cmake-build-debug
+configs/win_64/violence_win_64.exe
+configs/linux/violence_linux
