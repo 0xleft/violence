@@ -8,7 +8,7 @@ A functional 🤑 first programming language with limited types and basic featur
 
 ### Windows:
 
-Go to https://github.com/0xleft/violence/releases/latest
+Go to [Github releases](https://github.com/0xleft/violence/releases/latest)
 
 Download `violence_win_64.exe`
 
