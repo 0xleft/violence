@@ -4,7 +4,7 @@
 >
 > This is the official documentation for violence (.vio) programming language
 >
-> It is licensed under GPLv3 license that can be found [here](../LICENSE)
+> It is licensed under GPLv3 license that can be found [here](https://github.com/0xleft/violence/blob/master/LICENSE)
 
 ## Table of contents
 
