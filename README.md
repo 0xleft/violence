@@ -30,4 +30,4 @@ Contributions are welcome!! 😎 If you want to contribute please create a pull 
 
 ## License
 
-MIT
+GPLv3
