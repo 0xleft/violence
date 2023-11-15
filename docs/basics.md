@@ -10,11 +10,15 @@ Indentations are not required but are cool 😎
 
 ## Hello World
 
+A basic hello world would be like this:
+
 ```vio
 ( say -> "Hello World" )
 ```
 
 ## Comments
+
+Comments start with ~
 
 ```vio
 ( say -> "Hello World" ) ~ This is a comment
