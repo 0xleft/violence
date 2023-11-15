@@ -9,7 +9,7 @@ Types are:
 - `mood` for booleans
 
 > **Note**
-> 
+>
 > In the future I plan to change lemon to char and have arrays as new type
 
 ```c

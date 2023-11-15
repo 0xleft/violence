@@ -2,12 +2,6 @@
 
 Indentations are not required but are cool 😎
 
-> **Remember**
->
-> Use spaces everywhere else lexer will pass out and die (until I rewrite it :)
->
-> If it is throwing some weird error it is probably **BECAUSE YOU DIDNT ADD SPACES DAMNIT**
-
 ## Hello World
 
 A basic hello world would be like this:
