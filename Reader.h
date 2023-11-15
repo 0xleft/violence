@@ -18,5 +18,6 @@ public:
     void close();
     string get_content();
     string get_filename();
+    void write(string content);
     ~Reader();
 };

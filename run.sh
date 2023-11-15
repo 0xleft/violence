@@ -1,12 +1,12 @@
 set -e
 
-echo "Running... build at `date`"
+PROJECT_NAME="violence"
+TARGET_NAME="$PROJECT_NAME"_"$1"
 
 if [ "$1" = "" ]; then
   echo "No target selected"
   exit 0
 fi
 
-cmake --build . --target $1 -- -j 4
-./$1 $2
-exit 0
+./build.sh $1
+bin/$TARGET_NAME $2

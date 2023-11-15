@@ -1,49 +1,35 @@
-## Documentation for violence (programming language)
+# Documentation
 
-### What is violence?
+> **Disclaimer**
+>
+> This is the official documentation for violence (.vio) programming language
+>
+> It is licensed under GPLv3 license that can be found [here](../LICENSE)
 
-Violence is an interpreted language that has basic types such as 
-* `float` which is called `num`
-* `bool` which is called `mood`
-* `string` which is called `word`
+## Table of contents
 
-Keywords are:
-* `nah` which inverts the value of a `mood`
-* `good` which is a `mood` that is `true`
-* `bad` which is a `mood` that is `false`
-* `say` which prints a `word` to the console
-* `ask` which asks the user for input and stores it in a variable
-* `cya` deletes variable `use this to free memory`
-* `get` imports a file
-* `~` makes a line a comment
+> **Note**
+>
+> To build from source: [see this](building.md)
 
-### Special features
+From here you can navigate to the different sections of the documentation.
 
-* functions return their final statement
-* all variables are global
-* all functions return void
-* `if` a keyword can be used `if <mood>` and then the next line is executed if the mood is `good`
-* there is no recursion limit
-* there is no limit on the number of variables
-* strings can be concatenated with `+`
-* if number is used in a string context it is converted to a string so 2 + "2" : "22"
-* if string is used in a number context it is converted to a number so "2" + 2 : 4 (not at all confusing)
-* declare variable using `word name : value`
-* functions start with `f->` and end with `<-f`
-* indentation is not required but is recommended
-```violence
-f->test : name : num
-    say "Hello " + name + "!" + " Your number is " + num
-<-f
-test "John" 2
-```
+## Sections
 
-### How to use violence?
+### Violence Language (.vio)
 
-``
-violence <filename>.vio
-``
+| Section   | Description                     | Link                      |
+|-----------|---------------------------------|---------------------------|
+| Basics    | `Basics of the language`        | [Basics](basics.md)       |
+| Examples  | `Some examples`                 | [Examples](examples.md)   |
+| Functions | `More in depth about functions` | [Functions](functions.md) |
+| Variables | `More in depth about variables` | [Variables](variables.md) |
 
-### Example
 
-in [example.md](example.md)
+### Interpreter
+
+| Section     | Description                        | Link                               |
+|-------------|------------------------------------|------------------------------------|
+| Lexer       | `The lexical parser for files`     | [Lexer docs](lexer.md)             |
+| Parser      | `Parses tokens`                    | [Parser docs](parser.md)           |
+| Interpreter | `Interprets expressions and stuff` | [Interpreter docs](interpreter.md) |

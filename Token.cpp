@@ -50,8 +50,14 @@ string Token::get_type_string() {
             return "OPERATOR";
         case DELIMITER:
             return "DELIMITER";
-        case LITERAL:
-            return "LITERAL";
+        case LITERAL_NUMBER:
+            return "LITERAL_NUMBER";
+        case LITERAL_STRING:
+            return "LITERAL_STRING";
+        case FUNCTION_START:
+            return "FUNCTION_START";
+        case FUNCTION_END:
+            return "FUNCTION_END";
         case COMMENT:
             return "COMMENT";
         case WHITESPACE:

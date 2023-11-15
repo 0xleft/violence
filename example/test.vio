@@ -1,18 +1,3 @@
-~ comment
-
-word hello_there : "hello"
-lemon number : 5 + 5 - 2
-mood value_a : good
-
-
-~ comment
-
-f-> fun_test : one : two :
-    ~ inside the functions
-<-f
-
-void io : fun_test->one->two ~
-
-void io : sheesh->"ls -l"
-
-word test : hello_there + "test"
+mood a : "good"
+if a != "bad"
+( say -> "a is good" )

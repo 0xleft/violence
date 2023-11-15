@@ -1,0 +1,31 @@
+name: Build and publish
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake
+          sudo apt install -y mingw-w64
+          cmake .
+          chmod +x build-all.sh
+          ./build-all.sh release
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            bin/*
+            install.sh

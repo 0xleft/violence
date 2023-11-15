@@ -1,1 +1,3 @@
-num a : 5 + 5
+f-> test -> void
+( say -> "test" )
+<-f
