@@ -19,7 +19,7 @@ if ! [ -x "$(command -v wget)" ]; then
   fi
 fi
 
-# wget https://github.com/0xleft/violence/releases/download/v1.0.6/violence_linux
-wget https://github.com/0xleft/violence/releases/download/v1.0.6/violence_linux -O /usr/bin/violence
+# wget https://github.com/0xleft/violence/releases/download/v1.0.7/violence_linux
+wget https://github.com/0xleft/violence/releases/download/v1.0.7/violence_linux -O /usr/bin/violence
 chmod +x /usr/bin/violence
 echo "Violence installed in /usr/bin/violence"
