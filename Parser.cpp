@@ -18,9 +18,12 @@ Variable Parser::parse(vector<Token> tokens) {
     for (Token token : tokens) {
 
         if (token.get_type() == KEYWORD && token.get_value() == "f->") {
+            if (is_function) {
+                error_out("cannot have nested functions");
+            }
             is_function = true;
         }
-        if (token.get_type() == KEYWORD && token.get_value() == "<-f") {
+        if (token.get_type() == KEYWORD && token.get_value() == "<-f" && is_function) {
             line_tokens.push_back(token);
             string name = line_tokens[1].get_value();
             vector<string> arg_names;
