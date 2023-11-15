@@ -7,6 +7,12 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_C_COMPILER gcc)
 
+# make static
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+set(BUILD_SHARED_LIBS OFF)
+set(CMAKE_EXE_LINKER_FLAGS "-static")
+
+
 # put output bin to ../../
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../bin)
 
@@ -23,3 +29,5 @@ add_executable(violence_linux ../../main.cpp
         ../../Parser.cpp
         ../../Parser.h
 )
+
+target_link_libraries(violence_linux -static)

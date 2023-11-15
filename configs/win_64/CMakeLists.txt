@@ -7,6 +7,10 @@ set(CMAKE_SYSTEM_NAME Windows)
 set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++)
 set(CMAKE_C_COMPILER x86_64-w64-mingw32-gcc)
 
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+set(BUILD_SHARED_LIBS OFF)
+set(CMAKE_EXE_LINKER_FLAGS "-static")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../bin)
 
 add_executable(violence_win_64 ../../main.cpp
@@ -22,3 +26,5 @@ add_executable(violence_win_64 ../../main.cpp
         ../../Parser.cpp
         ../../Parser.h
 )
+
+target_link_libraries(violence_win_64 -static)
