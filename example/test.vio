@@ -1,3 +1,4 @@
 mood a : "good"
 if a != "bad"
 ( say -> "a is good" )
+8988467
