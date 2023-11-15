@@ -23,6 +23,8 @@ if [ -d "configs/$1" ]; then
     cmake -DCMAKE_BUILD_TYPE=Debug -S . -B build
   fi
   cmake --build . --target "$TARGET_NAME" -- -j 4
+
+  rm -rf ../bin
 else
   echo "Config $1 not found"
   exit 0
