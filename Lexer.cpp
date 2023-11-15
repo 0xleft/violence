@@ -49,35 +49,79 @@ vector<Token> Lexer::lex() {
 vector<Token> Lexer::lex_line(string line_content, int line) {
     vector<Token> tokens;
 
-    bool was_type = false;
-    bool function_start = false;
     string token_value = "";
+    char next_char;
     TokenType state = WHITESPACE;
 
     for (int i = 0; i < line_content.size(); i++) {
         current_char = line_content[i];
+        next_char = line_content[i + 1];
+
         int column = i + 1;
 
         // comment ~
         if (current_char == '~') {
+            // add prev token
+            if (token_value != "") {
+                tokens.push_back(Token(token_value, line, column, state));
+                token_value = "";
+            }
+
             state = COMMENT;
+            continue;
         }
 
         // type word lemon mood once per line
-        else if ((token_value == "wor" && current_char == 'd' || token_value == "lemo" && current_char == 'n' || token_value == "moo" && current_char == 'd' || token_value == "voi" && current_char == 'd') && !was_type) {
-            if (state == COMMENT) {
-                continue;
-            } else {
-                tokens.push_back(Token(token_value + current_char, line, column, TYPE));
-                token_value = "";
-                state = WHITESPACE;
-                was_type = true;
+        else if (token_value == "wor" && current_char == 'd' || token_value == "lemo" && current_char == 'n' || token_value == "moo" && current_char == 'd' || token_value == "voi" && current_char == 'd') {
+            tokens.push_back(Token(token_value + current_char, line, column, TYPE));
+            token_value = "";
+            state = WHITESPACE;
+            continue;
+        }
+
+        // keywords if, f-> to start function <-f to end function
+        else if ((token_value == "i" && current_char == 'f'
+                  || token_value == "f-" && current_char == '>'
+                  || token_value == "f" && current_char == '-'
+                  || token_value == "<-" && current_char == 'f'
+                 ) && state != LITERAL_STRING) {
+
+            state = KEYWORD;
+
+            if (next_char == '>') {
+                token_value += current_char;
                 continue;
             }
+
+            tokens.push_back(Token(token_value + current_char, line, column, KEYWORD));
+            token_value = "";
+            state = WHITESPACE;
+            continue;
+        }
+
+        // delimiter only one in our case which is : which stands for =
+        else if (current_char == ':' && state != LITERAL_STRING) {
+            // add prev token
+            if (token_value != "") {
+                tokens.push_back(Token(token_value, line, column, state));
+                token_value = "";
+            }
+
+            token_value = current_char;
+            tokens.push_back(Token(token_value, line, column, DELIMITER));
+            token_value = "";
+            state = WHITESPACE;
+            continue;
         }
 
         // string literal
         else if (current_char == '"') {
+            if (token_value != "" && state != LITERAL_STRING) {
+                tokens.push_back(Token(token_value, line, column, state));
+                token_value = "";
+                state = WHITESPACE;
+            }
+
             if (state == WHITESPACE || token_value == "->") {
                 state = LITERAL_STRING;
                 continue;
@@ -86,8 +130,6 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
                 token_value = "";
                 state = WHITESPACE;
                 continue;
-            } else if (state == COMMENT) {
-                continue;
             } else {
                 error("While parsing string literal", "Unexpected character", line, column);
             }
@@ -95,6 +137,12 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
 
         // number (lemon)
         else if (isdigit(current_char) && state != LITERAL_STRING && state != KEYWORD || current_char == '.' && state != LITERAL_STRING && state != KEYWORD) {
+            if (token_value != "" && state != LITERAL_NUMBER) {
+                tokens.push_back(Token(token_value, line, column, state));
+                token_value = "";
+                state = WHITESPACE;
+            }
+
             if (state == WHITESPACE) {
                 state = LITERAL_NUMBER;
                 // tokens.push_back(Token(token_value + current_char, line, column, state));
@@ -108,28 +156,6 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
                 // do nothing
             } else {
                 error("While parsing number", "Unexpected character", line, column);
-            }
-        }
-
-        // keywords if, (good, bad) moods, f-> to start function <-f to end function, ask, say, sheesh (shell commands), get (import)
-        else if ((token_value == "i" && current_char == 'f'
-                  || token_value == "f-" && current_char == '>'
-                  || token_value == "<-" && current_char == 'f'
-                 ) && state != LITERAL_STRING && state != KEYWORD) {
-            if (state == COMMENT) {
-                continue;
-            } else {
-                if (token_value == "f-" && current_char == '>') {
-                    function_start = true;
-                } else if (token_value == "<-" && current_char == 'f') {
-                    function_start = false;
-                }
-                state = KEYWORD;
-                // append to tokens
-                tokens.push_back(Token(token_value + current_char, line, column, state));
-                token_value = "";
-                state = WHITESPACE;
-                continue;
             }
         }
 
@@ -147,37 +173,52 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
         || current_char == '&'
         || current_char == '|'
         ) && state != LITERAL_STRING && state != KEYWORD) {
-            if (state == WHITESPACE) {
-                state = OPERATOR;
+            if (state == KEYWORD) {
                 token_value += current_char;
                 continue;
-            } else if (state == COMMENT) {
-                continue;
-            } else {
             }
+
+            if (token_value != "" && state != OPERATOR) {
+                tokens.push_back(Token(token_value, line, column, state));
+                token_value = "";
+                state = WHITESPACE;
+            }
+
+            state = OPERATOR;
+            token_value += current_char;
+            continue;
         }
 
         // if ( or ) set function start and function end
         else if ((current_char == '(' || current_char == ')') && state != LITERAL_STRING && state != KEYWORD) {
-            if (state == COMMENT) {
-                continue;
-            } else {
-                if (current_char == '(') {
-                    tokens.push_back(Token("(", line, column, FUNCTION_START));
-                    token_value = "";
-                    state = WHITESPACE;
-                } else if (current_char == ')') {
-                    tokens.push_back(Token(")", line, column, FUNCTION_END));
-                    token_value = "";
-                    state = WHITESPACE;
-                }
-
-                continue;
+            if (token_value != "") {
+                tokens.push_back(Token(token_value, line, column, state));
+                token_value = "";
+                state = WHITESPACE;
             }
+
+            if (current_char == '(') {
+                tokens.push_back(Token("(", line, column, FUNCTION_START));
+                token_value = "";
+                state = WHITESPACE;
+            } else if (current_char == ')') {
+                tokens.push_back(Token(")", line, column, FUNCTION_END));
+                token_value = "";
+                state = WHITESPACE;
+            }
+
+            continue;
         }
 
         // identifier
         else if ((isalpha(current_char) || current_char == '_') && state != LITERAL_STRING && state != KEYWORD) {
+
+            if (token_value != "" && state != IDENTIFIER) {
+                tokens.push_back(Token(token_value, line, column, state));
+                token_value = "";
+                state = WHITESPACE;
+            }
+
             if (state == WHITESPACE) {
                 state = IDENTIFIER;
             } else if (state == COMMENT) {
@@ -185,14 +226,12 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
             } else if (state == IDENTIFIER) {
                 // do nothing
             } else {
-                printf("Token value: %s\n", token_value.c_str());
-                printf("State: %d\n", state);
                 error("While parsing identifier", "Unexpected character", line, column);
             }
         }
 
         // function name and arsg f-> name : arg : arg
-        else if (current_char == ':' && function_start) {
+        else if (current_char == ':') {
             if (state == WHITESPACE) {
                 tokens.push_back(Token(token_value, line, column, IDENTIFIER));
                 token_value = "";
@@ -205,35 +244,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
             }
         }
 
-        // whitespace
-        else if ((current_char == ' ' || current_char == '\t' || current_char == '\n') && state != LITERAL_STRING) {
-            if (state == WHITESPACE) {
-                // todo
-                continue;
-            } else if (state == COMMENT) {
-                continue;
-            } else {
-                tokens.push_back(Token(token_value, line, column, state));
-                token_value = "";
-                state = WHITESPACE;
-                continue;
-            }
-        }
-
-        // delimiter only one in our case which is : which stands for =
-        else if (current_char == ':' && state != LITERAL_STRING) {
-            if (state == COMMENT) {
-                continue;
-            } else {
-                token_value = current_char;
-                tokens.push_back(Token(token_value, line, column, DELIMITER));
-                token_value = "";
-                state = WHITESPACE;
-                continue;
-            }
-        }
-
-        // helper for string literal
+        // dont add spaces unless its a string literal
         if ((current_char == ' ' || current_char == '\t') && state != LITERAL_STRING) {
             continue;
         }
