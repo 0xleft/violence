@@ -19,7 +19,6 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential cmake
           sudo apt install -y mingw-w64
-          cmake .
           chmod +x build-all.sh
           ./build-all.sh release
       - name: Publish to GitHub Releases
