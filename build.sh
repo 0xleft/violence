@@ -14,6 +14,7 @@ fi
 if [ -d "configs/$1" ]; then
   echo "Config $1 selected"
   cd configs/$1
+  echo `ls -la`
   cmake .
   if [ "$2" = "release" ]; then
     echo "Release selected"
