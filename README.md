@@ -6,6 +6,16 @@ A functional 🤑 first programming language with limited types and basic featur
 
 ## Install 😇
 
+### Windows:
+
+Go to https://github.com/0xleft/violence/releases/latest
+
+Download `violence_win_64.exe`
+
+Rename it and use it in command line
+
+### Linux:
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/0xleft/violence/master/install.sh | sudo sh
 ```
