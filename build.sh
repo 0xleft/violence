@@ -13,7 +13,11 @@ fi
 # check dir if exists in configs/ folder with name $1
 if [ -d "configs/$1" ]; then
   echo "Config $1 selected"
+
   cd configs/$1
+
+  echo `ls -la`
+
   cmake .
   if [ "$2" = "release" ]; then
     echo "Release selected"
@@ -22,6 +26,9 @@ if [ -d "configs/$1" ]; then
     echo "Debug selected"
     cmake -DCMAKE_BUILD_TYPE=Debug -S . -B build
   fi
+
+  echo "Building... $TARGET_NAME"
+
   cmake --build . --target "$TARGET_NAME" -- -j 4
 
   rm -rf ../bin
