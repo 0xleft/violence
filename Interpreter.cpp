@@ -257,7 +257,8 @@ string Expression::evaluate(string return_type) {
 
         for (int i = 0; i < tokens.size(); i++) {
             Token token = tokens[i];
-            if (i == start_index - 1) {
+            // we want to also replace the token that we were indexing
+            if (i == start_index - 2) {
                 // replace indexer call with return value
                 new_tokens.push_back(Token(new_value, 0, 0, LITERAL_STRING));
                 i = end_index + 1;

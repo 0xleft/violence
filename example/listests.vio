@@ -1,4 +1,4 @@
 word a : "hello world"
-word b : a[1]
+word b : a[5]
 
 (say->b)
