@@ -159,6 +159,31 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
     return output;
 }
 
+void check_finished_calls(vector<Token> tokens) {
+    int func_count = 0;
+    int index_count = 0;
+
+    for (Token token : tokens) {
+        if (token.get_type() == FUNCTION_START) {
+            func_count++;
+        } else if (token.get_type() == FUNCTION_END) {
+            func_count--;
+        } else if (token.get_type() == INDEXER_START) {
+            index_count++;
+        } else if (token.get_type() == INDEXER_END) {
+            index_count--;
+        }
+    }
+
+    if (func_count != 0) {
+        error_out("function declaration is not finished");
+    }
+
+    if (index_count != 0) {
+        error_out("indexer is not finished");
+    }
+}
+
 int count_indexer_calls(vector<Token> tokens) {
     int count = 0;
     for (Token token : tokens) {
@@ -190,6 +215,8 @@ string Expression::evaluate(string return_type) {
     if (tokens[0].get_type() == OPERATOR) {
         error_out("expression cannot start with operator");
     }
+
+    check_finished_calls(tokens);
 
     // resovlve indexer so its a string[index] -> string
     while (count_indexer_calls(tokens) != 0) {
