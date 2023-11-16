@@ -19,6 +19,8 @@ enum TokenType {
     LITERAL_NUMBER,
     FUNCTION_START,
     FUNCTION_END,
+    INDEXER_START,
+    INDEXER_END,
     COMMENT,
     WHITESPACE,
     EOL,

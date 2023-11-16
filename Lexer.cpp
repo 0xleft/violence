@@ -103,7 +103,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
         }
 
         // delimiter only one in our case which is : which stands for =
-        else if ((current_char == ':'  || current_char == '[' || current_char == ']' || current_char == ',') && state != LITERAL_STRING) {
+        else if ((current_char == ':'  || current_char == ',') && state != LITERAL_STRING) {
             // add prev token
             if (token_value != "") {
                 tokens.push_back(Token(token_value, line, column, state));
@@ -112,6 +112,25 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
 
             token_value = current_char;
             tokens.push_back(Token(token_value, line, column, DELIMITER));
+            token_value = "";
+            state = WHITESPACE;
+            continue;
+        }
+
+        // indexer start and end
+        else if ((current_char == '['  || current_char == ']') && state != LITERAL_STRING) {
+            // add prev token
+            if (token_value != "") {
+                tokens.push_back(Token(token_value, line, column, state));
+                token_value = "";
+            }
+
+            token_value = current_char;
+            if (current_char == '[') {
+                tokens.push_back(Token("[", line, column, INDEXER_START));
+            } else if (current_char == ']') {
+                tokens.push_back(Token("]", line, column, INDEXER_END));
+            }
             token_value = "";
             state = WHITESPACE;
             continue;

@@ -159,6 +159,16 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
     return output;
 }
 
+int count_indexer_calls(vector<Token> tokens) {
+    int count = 0;
+    for (Token token : tokens) {
+        if (token.get_type() == INDEXER_START) {
+            count++;
+        }
+    }
+    return count;
+}
+
 int count_function_calls(vector<Token> tokens) {
     int count = 0;
     for (Token token : tokens) {
@@ -179,6 +189,84 @@ string Expression::evaluate(string return_type) {
 
     if (tokens[0].get_type() == OPERATOR) {
         error_out("expression cannot start with operator");
+    }
+
+    // resovlve indexer so its a string[index] -> string
+    while (count_indexer_calls(tokens) != 0) {
+        // find first indexer call
+        int start_index = -1;
+        int end_index = -1;
+
+        for (int i = 0; i < tokens.size(); i++) {
+            Token token = tokens[i];
+            if (token.get_type() == INDEXER_START) {
+                start_index = i + 1;
+            } else if (token.get_type() == INDEXER_END) {
+                end_index = i - 1;
+                break;
+            }
+        }
+
+        if (start_index == -1 || end_index == -1) {
+            error_out("invalid indexer call");
+        }
+
+        // print tokens in that range
+        vector<Token> indexer_tokens = vector<Token>();
+        for (int i = start_index; i <= end_index; i++) {
+            indexer_tokens.push_back(tokens[i]);
+        }
+
+        // resolve indexer
+        Expression expression = Expression(indexer_tokens, "lemon", this->interpreter);
+        string indexer_value = expression.evaluate("lemon");
+
+        if (indexer_value == "") {
+            error_out("invalid indexer value");
+        }
+
+        // get the nth character
+        int index = 0;
+        try {
+            index = std::stoi(indexer_value);
+        } catch (const std::invalid_argument& ia) {
+            error_out("invalid indexer value not an integer");
+        }
+
+        // get the variable
+        string variable_name = tokens[0].get_value();
+
+        // check if variable exists
+        if (this->interpreter->get_global_scope()->get_variable(variable_name).get_name() == "") {
+            error_out("variable \"" + variable_name + "\" does not exist");
+        }
+
+        // get value
+        string variable_value = this->interpreter->get_global_scope()->get_variable(variable_name).get_value();
+
+        // get the nth character
+        string new_value = "";
+        try {
+            new_value = variable_value.substr(index, 1);
+        } catch (const std::out_of_range& ia) {
+            error_out("indexer value out of range");
+        }
+
+        // replace indexer call with return value
+        vector<Token> new_tokens = vector<Token>();
+
+        for (int i = 0; i < tokens.size(); i++) {
+            Token token = tokens[i];
+            if (i == start_index - 1) {
+                // replace indexer call with return value
+                new_tokens.push_back(Token(new_value, 0, 0, LITERAL_STRING));
+                i = end_index + 1;
+            } else {
+                new_tokens.push_back(token);
+            }
+        }
+
+        tokens = new_tokens;
     }
 
     // resolve function calls and replace with return value token

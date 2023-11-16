@@ -35,8 +35,6 @@ int handle_file_mode(char *filename) {
     Lexer lexer(content);
     vector<Token> tokens = lexer.lex();
 
-    Token::print_tokens(tokens);
-
     Parser parser;
 
     // todo
