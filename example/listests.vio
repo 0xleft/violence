@@ -2,3 +2,5 @@ word a : "hello world"
 word b : a[3]
 
 (say->b)
+
+(get->"example/import.vio")

@@ -84,19 +84,39 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
             // import another violence file
             // basicaly just parse the file and add the functions to the interpreter
 
+            if (interpreter->get_parent() != nullptr) {
+                // check for circular imports
+                if (interpreter->is_imported(args[0].get_value())) {
+                    error_out("circular import detected in file \"" + args[0].get_value() + "\"");
+                }
+            }
+
             // get
             Reader reader = Reader(args[0].get_value());
             string content = reader.get_content();
             reader.close();
 
             if (content == "") {
-                error_out("file \"" + args[0].get_value() + "\" does not exist or is empty");
+                error_out("file \"" + args[0].get_value() + "\" does not exist");
             }
 
             Parser parser = Parser();
+            // add imported file to imported list
+            parser.get_interpreter()->add_imported(args[0].get_value());
+            for (string imported : interpreter->get_imported()) {
+                parser.get_interpreter()->add_imported(imported);
+            }
+
+            parser.get_interpreter()->set_parent(interpreter);
+
             Lexer lexer = Lexer(content);
             vector<Token> tokens = lexer.lex();
             parser.parse(tokens);
+
+            // all imported files are added to the parent
+            for (string imported : parser.get_interpreter()->get_imported()) {
+                parser.get_interpreter()->get_parent()->add_imported(imported);
+            }
 
             // get all the functions and add them to the interpreter
             vector<Function> functions = parser.get_interpreter()->get_functions();
