@@ -72,7 +72,10 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
         }
 
         // type word lemon mood once per line
-        else if (token_value == "wor" && current_char == 'd' || token_value == "lemo" && current_char == 'n' || token_value == "moo" && current_char == 'd' || token_value == "voi" && current_char == 'd') {
+        else if (token_value == "wor" && current_char == 'd'
+        || token_value == "lemo" && current_char == 'n'
+        || token_value == "moo" && current_char == 'd'
+        || token_value == "voi" && current_char == 'd') {
             tokens.push_back(Token(token_value + current_char, line, column, TYPE));
             token_value = "";
             state = WHITESPACE;
@@ -100,7 +103,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
         }
 
         // delimiter only one in our case which is : which stands for =
-        else if (current_char == ':' && state != LITERAL_STRING) {
+        else if ((current_char == ':'  || current_char == '[' || current_char == ']' || current_char == ',') && state != LITERAL_STRING) {
             // add prev token
             if (token_value != "") {
                 tokens.push_back(Token(token_value, line, column, state));
@@ -227,20 +230,6 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
                 // do nothing
             } else {
                 error("While parsing identifier", "Unexpected character", line, column);
-            }
-        }
-
-        // function name and arsg f-> name : arg : arg
-        else if (current_char == ':') {
-            if (state == WHITESPACE) {
-                tokens.push_back(Token(token_value, line, column, IDENTIFIER));
-                token_value = "";
-                state = WHITESPACE;
-                continue;
-            } else if (state == COMMENT) {
-                continue;
-            } else {
-                error("While parsing function name", "Unexpected character", line, column);
             }
         }
 

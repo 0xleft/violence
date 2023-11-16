@@ -15,7 +15,7 @@ int handle_interactive_mode() {
 
         Variable output = parser.parse(tokens);
 
-        if (output.get_value() == "") {
+        if (output.get_type() == "void") {
             printf(">>> ");
             continue;
         }
@@ -34,6 +34,8 @@ int handle_file_mode(char *filename) {
 
     Lexer lexer(content);
     vector<Token> tokens = lexer.lex();
+
+    Token::print_tokens(tokens);
 
     Parser parser;
 
