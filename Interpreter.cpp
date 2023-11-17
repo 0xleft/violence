@@ -258,45 +258,72 @@ string Expression::evaluate(string return_type) {
             error_out("invalid indexer call");
         }
 
-        // print tokens in that range
-        vector<Token> indexer_tokens = vector<Token>();
-        for (int i = start_index; i <= end_index; i++) {
-            indexer_tokens.push_back(tokens[i]);
+        bool is_range = false;
+        for (int i = start_index; i < end_index; i++) {
+            Token token = tokens[i];
+            if (token.get_type() == DELIMITER && token.get_value() == ":") {
+                is_range = true;
+                break;
+            }
         }
 
-        // resolve indexer
-        Expression expression = Expression(indexer_tokens, "lemon", this->interpreter);
-        string indexer_value = expression.evaluate("lemon");
-
-        if (indexer_value == "") {
-            error_out("invalid indexer value");
-        }
-
-        // get the nth character
-        int index = 0;
-        try {
-            index = std::stoi(indexer_value);
-        } catch (const std::invalid_argument& ia) {
-            error_out("invalid indexer value not an integer");
-        }
-
-        // get the variable
-        string variable_name = tokens[0].get_value();
-
-        // check if variable exists
-        if (this->interpreter->get_global_scope()->get_variable(variable_name).get_name() == "") {
-            error_out("variable \"" + variable_name + "\" does not exist");
-        }
-
-        // get value
-        string variable_value = this->interpreter->get_global_scope()->get_variable(variable_name).get_value();
-
-        // get the nth character
         string new_value = "";
-        try {
-            new_value = variable_value.substr(index, 1);
-        } catch (const std::out_of_range& ia) {
-            error_out("indexer value out of range");
+
+        if (is_range) {
+            // left side of :
+            vector<Token> left_tokens = vector<Token>();
+            for (int i = start_index; i < end_index; i++) {
+                Token token = tokens[i];
+                if (token.get_type() == DELIMITER && token.get_value() == ":") {
+                    break;
+                }
+                left_tokens.push_back(token);
+            }
+
+            // right side
+            vector<Token> right_tokens = vector<Token>();
+            for (int i = end_index; i > start_index; i--) {
+                Token token = tokens[i];
+                if (token.get_type() == DELIMITER && token.get_value() == ":") {
+                    break;
+                }
+                right_tokens.push_back(token);
+            }
+
+            // resolve expressions
+            Expression left_expression = Expression(left_tokens, "lemon", this->interpreter);
+            Expression right_expression = Expression(right_tokens, "lemon", this->interpreter);
+
+            string left_value = left_expression.evaluate("lemon");
+            string right_value = right_expression.evaluate("lemon");
+
+            // get the nth character
+            int index_from = 0;
+            int index_to = 0;
+            try {
+                index_from = std::stoi(left_value);
+                index_to = std::stoi(right_value);
+            } catch (const std::invalid_argument& ia) {
+                error_out("invalid indexer value not an integer");
+            }
+
+            // get the variable
+            string variable_name = tokens[0].get_value();
+
+            // check if variable exists
+            if (this->interpreter->get_global_scope()->get_variable(variable_name).get_name() == "") {
+                error_out("variable \"" + variable_name + "\" does not exist");
+            }
+
+            // get value
+            string variable_value = this->interpreter->get_global_scope()->get_variable(variable_name).get_value();
+
+            // get the nth character
+            try {
+                new_value = variable_value.substr(index_from, index_to - index_from);
+            } catch (const std::out_of_range& ia) {
+                error_out("indexer value out of range");
+            }
         }
 
         // replace indexer call with return value
