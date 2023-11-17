@@ -32,6 +32,11 @@ int handle_file_mode(char *filename) {
     string content = reader.get_content();
     reader.close();
 
+    if (content == "") {
+        printf("Error: File not found\n");
+        return 1;
+    }
+
     Lexer lexer(content);
     vector<Token> tokens = lexer.lex();
 

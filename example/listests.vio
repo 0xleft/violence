@@ -1,6 +1,4 @@
 word a : "hello world"
-word b : a[3]
+word b : a[3:5]
 
 (say->b)
-
-(get->"example/import.vio")
