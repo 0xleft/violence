@@ -15,12 +15,10 @@ int handle_interactive_mode() {
 
         Variable output = parser.parse(tokens);
 
-        if (output.get_type() == "void") {
-            printf(">>> ");
-            continue;
+        if (output.get_value() != "") {
+            printf("%s\n", output.get_value().c_str());
         }
 
-        printf("%s\n", output.get_value().c_str());
         printf(">>> ");
     }
 
