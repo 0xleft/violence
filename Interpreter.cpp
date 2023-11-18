@@ -10,6 +10,8 @@
 #include "Reader.h"
 #include "Lexer.h"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "UnreachableCode"
 using namespace std;
 
 void error_out(string error) {
@@ -31,6 +33,7 @@ Interpreter::Interpreter() {
     this->functions.push_back(Function("read", 1, vector<Token>(), "word"));
     this->functions.push_back(Function("write", 2, vector<Token>(), "void"));
     this->functions.push_back(Function("exit", 0, vector<Token>(), "void"));
+    this->functions.push_back(Function("size", 1, vector<Token>(), "lemon"));
 }
 
 string exec(string cmd) {
@@ -51,7 +54,7 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
         error_out("invalid number of arguments");
     }
 
-    vector<string> special_functions = {"ask", "say", "sheesh", "get", "read", "write", "exit"};
+    vector<string> special_functions = {"ask", "say", "sheesh", "get", "read", "write", "exit", "size"};
 
     // if special function
     if (std::find(special_functions.begin(), special_functions.end(), this->name) != special_functions.end()) {
@@ -156,6 +159,14 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
             // exit
             printf("Exiting...\n");
             exit(0);
+        } else if (this->name == "size") {
+            // size
+            if (args[0].get_type() != "word") {
+                error_out("size only accepts word type");
+            }
+
+            string value = args[0].get_value();
+            return Variable("output", "lemon", std::to_string(value.size()));
         }
     }
 
@@ -258,28 +269,21 @@ string Expression::evaluate(string return_type) {
             error_out("invalid indexer call");
         }
 
-        bool is_range = false;
-        for (int i = start_index; i < end_index; i++) {
+        bool is_right = false;
+
+        vector<Token> left_tokens = vector<Token>();
+        for (int i = start_index; i <= end_index; i++) {
             Token token = tokens[i];
             if (token.get_type() == DELIMITER && token.get_value() == ":") {
-                is_range = true;
+                is_right = true;
                 break;
             }
+            left_tokens.push_back(token);
         }
 
         string new_value = "";
 
-        if (is_range) {
-            // left side of :
-            vector<Token> left_tokens = vector<Token>();
-            for (int i = start_index; i < end_index; i++) {
-                Token token = tokens[i];
-                if (token.get_type() == DELIMITER && token.get_value() == ":") {
-                    break;
-                }
-                left_tokens.push_back(token);
-            }
-
+        if (is_right) {
             // right side
             vector<Token> right_tokens = vector<Token>();
             for (int i = end_index; i > start_index; i--) {
@@ -290,40 +294,32 @@ string Expression::evaluate(string return_type) {
                 right_tokens.push_back(token);
             }
 
-            // resolve expressions
             Expression left_expression = Expression(left_tokens, "lemon", this->interpreter);
             Expression right_expression = Expression(right_tokens, "lemon", this->interpreter);
+            string left_index = left_expression.evaluate("lemon");
+            string right_index = right_expression.evaluate("lemon");
 
-            string left_value = left_expression.evaluate("lemon");
-            string right_value = right_expression.evaluate("lemon");
-
-            // get the nth character
-            int index_from = 0;
-            int index_to = 0;
             try {
-                index_from = std::stoi(left_value);
-                index_to = std::stoi(right_value);
+                std::stoi(left_index);
+                std::stoi(right_index);
             } catch (const std::invalid_argument& ia) {
-                error_out("invalid indexer value not an integer");
+                error_out("invalid index");
             }
 
-            // get the variable
-            string variable_name = tokens[0].get_value();
+            string token_value = resolve(tokens[start_index - 2]);
+            new_value =  token_value.substr(std::stoi(left_index), std::stoi(right_index) - std::stoi(left_index));
+        } else {
+            Expression expression = Expression(left_tokens, "lemon", this->interpreter);
+            string index = expression.evaluate("lemon");
 
-            // check if variable exists
-            if (this->interpreter->get_global_scope()->get_variable(variable_name).get_name() == "") {
-                error_out("variable \"" + variable_name + "\" does not exist");
-            }
-
-            // get value
-            string variable_value = this->interpreter->get_global_scope()->get_variable(variable_name).get_value();
-
-            // get the nth character
             try {
-                new_value = variable_value.substr(index_from, index_to - index_from);
-            } catch (const std::out_of_range& ia) {
-                error_out("indexer value out of range");
+                std::stoi(index);
+            } catch (const std::invalid_argument& ia) {
+                error_out("invalid index");
             }
+
+            string token_value = resolve(tokens[start_index - 2]);
+            new_value =  token_value.substr(std::stoi(index), 1);
         }
 
         // replace indexer call with return value
@@ -614,3 +610,4 @@ string Expression::resolve(Token token) {
 
     return "";
 }
+#pragma clang diagnostic pop
