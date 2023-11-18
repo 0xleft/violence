@@ -8,15 +8,8 @@ fi
 
 # check if wget installed
 if ! [ -x "$(command -v wget)" ]; then
-  # ask to install wget
-  echo "wget is not installed. Install? (y/n)"
-  read install_wget
-  if [ "$install_wget" = "y" ]; then
-    apt-get install wget
-  else
-    echo "wget is required"
-    exit 0
-  fi
+  echo "Error: wget is not installed."
+  exit 1
 fi
 
 # wget https://github.com/0xleft/violence/releases/download/v1.0.7/violence_linux
