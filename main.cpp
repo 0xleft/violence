@@ -2,6 +2,16 @@
 #include "Lexer.h"
 #include "Reader.h"
 #include "Parser.h"
+#include "InlineCHandler.h"
+
+void a() {
+    InlineCHandler handler;
+    handler.add_function("char *b() { return \"Hello World\"; }");
+    handler.compile("c");
+    vector<string> args = vector<string>();
+    string output = handler.run("c", "b", args);
+    printf("%s\n", output.c_str());
+}
 
 int handle_interactive_mode() {
     // read from stdin
@@ -47,6 +57,8 @@ int handle_file_mode(char *filename) {
 }
 
 int main(int argc, char *argv[]) {
+
+    a();
 
     if (argv[1] != NULL) {
         handle_file_mode(argv[1]);

@@ -7,3 +7,7 @@ word b : (size->a)
 (say->a[0])
 
 (say->a[0:10])
+
+[c]
+printf("test\n");
+[/c]

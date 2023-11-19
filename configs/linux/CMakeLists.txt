@@ -28,6 +28,10 @@ add_executable(violence_linux ../../main.cpp
         ../../utils.h
         ../../Parser.cpp
         ../../Parser.h
+        ../../InlineCHandler.cpp
+        ../../InlineCHandler.h
 )
 
+# include dl
+target_link_libraries(violence_linux dl)
 target_link_libraries(violence_linux -static)

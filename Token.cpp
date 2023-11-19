@@ -62,6 +62,8 @@ string Token::get_type_string() {
             return "COMMENT";
         case INDEXER_START:
             return "INDEXER_START";
+        case INLINE_C:
+            return "INLINE_C";
         case INDEXER_END:
             return "INDEXER_END";
         case WHITESPACE:
