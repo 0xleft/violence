@@ -15,6 +15,7 @@ Variable Parser::parse(vector<Token> tokens) {
 
     bool is_function = false;
     bool skipping = false;
+    bool is_inline_c = false;
 
     for (Token token : tokens) {
 
@@ -50,6 +51,7 @@ Variable Parser::parse(vector<Token> tokens) {
                     break;
                 } else if (found_start) {
                     if (line_tokens[i].get_type() == INLINE_C) {
+                        is_inline_c = true;
                         // if not compiled then compile
                         InlineCHandler inline_c_handler;
                         inline_c_handler.add_function(line_tokens[i].get_value());
@@ -60,16 +62,16 @@ Variable Parser::parse(vector<Token> tokens) {
                         // add function to interpreter
                         CFunction c_function = CFunction(name, name, return_type);
                         this->interpreter->add_c_function(c_function);
-
-                        // insert function call tokens
-                        body.push_back(Token("(", 0, 0, FUNCTION_START));
-                        body.push_back(Token(name + string("_c"), 0, 0, IDENTIFIER));
-                        body.push_back(Token(")", 0, 0, FUNCTION_END));
-                        body.push_back(Token("EOL", 0, 0, EOL));
                         continue;
                     }
                     body.push_back(line_tokens[i]);
                 }
+            }
+
+            if (is_inline_c) {
+                is_inline_c = false;
+                is_function = false;
+                continue;
             }
 
             Function function = Function(name, arg_names, body, return_type);
@@ -93,6 +95,7 @@ Variable Parser::parse(vector<Token> tokens) {
             line_tokens.push_back(token);
         }
     }
+
 
     return variable;
 }

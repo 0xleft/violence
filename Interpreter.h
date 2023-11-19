@@ -221,7 +221,7 @@ public:
 
     CFunction get_c_function(string name) {
         for (CFunction c_function : this->c_functions) {
-            if ((c_function.get_name() + "_c") == name) {
+            if (c_function.get_name() == name) {
                 return c_function;
             }
         }

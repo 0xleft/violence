@@ -8,5 +8,13 @@ return "aafefefaa aWorld";
 [/c]
 <-f
 
+f-> testa -> word
+(say->"test")
+<-f
+
 word a : (test)
-(say->a)
+f-> w -> s -> word
+word s : s
+<-f
+
+(say->(w -> (size -> a)))
