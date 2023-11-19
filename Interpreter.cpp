@@ -544,9 +544,18 @@ string Expression::resolve_function(vector<Token> tokens) {
                 printf("%s was not compiled in parser exiting...\n", c_function.get_name().c_str());
                 exit(1);
             }
-            vector<string> args = {};
+
+            // get args
+            vector<string> args = vector<string>();
+            for (int i = 1; i < tokens.size(); i++) {
+                Token token = tokens[i];
+                if (token.get_type() == OPERATOR && token.get_value() == "->") {
+                    string arg_value = resolve(tokens[i + 1]);
+                    args.push_back(arg_value);
+                }
+            }
+
             string output = inline_c_handler.run(c_function.get_name(), c_function.get_name(), args);
-            printf("output: %s\n", output.c_str());
             return output;
         } else {
             error_out("function \"" + function_name + "\" does not exist");
