@@ -166,8 +166,36 @@ private:
     Scope *global_scope;
     vector<Function> functions;
     vector<FunctionSymlink> function_symlinks;
+    vector<string> imported;
+    Interpreter *parent;
 public:
     Interpreter();
+
+    void set_parent(Interpreter *parent) {
+        this->parent = parent;
+    }
+
+    Interpreter *get_parent() {
+        return this->parent;
+    }
+
+    // import
+    void add_imported(string name) {
+        this->imported.push_back(name);
+    }
+
+    vector<string> get_imported() {
+        return this->imported;
+    }
+
+    bool is_imported(string name) {
+        for (string imported : this->imported) {
+            if (imported == name) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     Scope *get_global_scope() {
         return this->global_scope;

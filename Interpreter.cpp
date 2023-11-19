@@ -10,6 +10,8 @@
 #include "Reader.h"
 #include "Lexer.h"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "UnreachableCode"
 using namespace std;
 
 void error_out(string error) {
@@ -31,6 +33,7 @@ Interpreter::Interpreter() {
     this->functions.push_back(Function("read", 1, vector<Token>(), "word"));
     this->functions.push_back(Function("write", 2, vector<Token>(), "void"));
     this->functions.push_back(Function("exit", 0, vector<Token>(), "void"));
+    this->functions.push_back(Function("size", 1, vector<Token>(), "lemon"));
 }
 
 string exec(string cmd) {
@@ -51,7 +54,7 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
         error_out("invalid number of arguments");
     }
 
-    vector<string> special_functions = {"ask", "say", "sheesh", "get", "read", "write", "exit"};
+    vector<string> special_functions = {"ask", "say", "sheesh", "get", "read", "write", "exit", "size"};
 
     // if special function
     if (std::find(special_functions.begin(), special_functions.end(), this->name) != special_functions.end()) {
@@ -84,19 +87,39 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
             // import another violence file
             // basicaly just parse the file and add the functions to the interpreter
 
+            if (interpreter->get_parent() != nullptr) {
+                // check for circular imports
+                if (interpreter->is_imported(args[0].get_value())) {
+                    error_out("circular import detected in file \"" + args[0].get_value() + "\"");
+                }
+            }
+
             // get
             Reader reader = Reader(args[0].get_value());
             string content = reader.get_content();
             reader.close();
 
             if (content == "") {
-                error_out("file \"" + args[0].get_value() + "\" does not exist or is empty");
+                error_out("file \"" + args[0].get_value() + "\" does not exist");
             }
 
             Parser parser = Parser();
+            // add imported file to imported list
+            parser.get_interpreter()->add_imported(args[0].get_value());
+            for (string imported : interpreter->get_imported()) {
+                parser.get_interpreter()->add_imported(imported);
+            }
+
+            parser.get_interpreter()->set_parent(interpreter);
+
             Lexer lexer = Lexer(content);
             vector<Token> tokens = lexer.lex();
             parser.parse(tokens);
+
+            // all imported files are added to the parent
+            for (string imported : parser.get_interpreter()->get_imported()) {
+                parser.get_interpreter()->get_parent()->add_imported(imported);
+            }
 
             // get all the functions and add them to the interpreter
             vector<Function> functions = parser.get_interpreter()->get_functions();
@@ -136,6 +159,14 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
             // exit
             printf("Exiting...\n");
             exit(0);
+        } else if (this->name == "size") {
+            // size
+            if (args[0].get_type() != "word") {
+                error_out("size only accepts word type");
+            }
+
+            string value = args[0].get_value();
+            return Variable("output", "lemon", std::to_string(value.size()));
         }
     }
 
@@ -159,6 +190,41 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
     return output;
 }
 
+void check_finished_calls(vector<Token> tokens) {
+    int func_count = 0;
+    int index_count = 0;
+
+    for (Token token : tokens) {
+        if (token.get_type() == FUNCTION_START) {
+            func_count++;
+        } else if (token.get_type() == FUNCTION_END) {
+            func_count--;
+        } else if (token.get_type() == INDEXER_START) {
+            index_count++;
+        } else if (token.get_type() == INDEXER_END) {
+            index_count--;
+        }
+    }
+
+    if (func_count != 0) {
+        error_out("function declaration is not finished");
+    }
+
+    if (index_count != 0) {
+        error_out("indexer is not finished");
+    }
+}
+
+int count_indexer_calls(vector<Token> tokens) {
+    int count = 0;
+    for (Token token : tokens) {
+        if (token.get_type() == INDEXER_START) {
+            count++;
+        }
+    }
+    return count;
+}
+
 int count_function_calls(vector<Token> tokens) {
     int count = 0;
     for (Token token : tokens) {
@@ -179,6 +245,99 @@ string Expression::evaluate(string return_type) {
 
     if (tokens[0].get_type() == OPERATOR) {
         error_out("expression cannot start with operator");
+    }
+
+    check_finished_calls(tokens);
+
+    // resovlve indexer so its a string[index] -> string
+    while (count_indexer_calls(tokens) != 0) {
+        // find first indexer call
+        int start_index = -1;
+        int end_index = -1;
+
+        for (int i = 0; i < tokens.size(); i++) {
+            Token token = tokens[i];
+            if (token.get_type() == INDEXER_START) {
+                start_index = i + 1;
+            } else if (token.get_type() == INDEXER_END) {
+                end_index = i - 1;
+                break;
+            }
+        }
+
+        if (start_index == -1 || end_index == -1) {
+            error_out("invalid indexer call");
+        }
+
+        bool is_right = false;
+
+        vector<Token> left_tokens = vector<Token>();
+        for (int i = start_index; i <= end_index; i++) {
+            Token token = tokens[i];
+            if (token.get_type() == DELIMITER && token.get_value() == ":") {
+                is_right = true;
+                break;
+            }
+            left_tokens.push_back(token);
+        }
+
+        string new_value = "";
+
+        if (is_right) {
+            // right side
+            vector<Token> right_tokens = vector<Token>();
+            for (int i = end_index; i > start_index; i--) {
+                Token token = tokens[i];
+                if (token.get_type() == DELIMITER && token.get_value() == ":") {
+                    break;
+                }
+                right_tokens.push_back(token);
+            }
+
+            Expression left_expression = Expression(left_tokens, "lemon", this->interpreter);
+            Expression right_expression = Expression(right_tokens, "lemon", this->interpreter);
+            string left_index = left_expression.evaluate("lemon");
+            string right_index = right_expression.evaluate("lemon");
+
+            try {
+                std::stoi(left_index);
+                std::stoi(right_index);
+            } catch (const std::invalid_argument& ia) {
+                error_out("invalid index");
+            }
+
+            string token_value = resolve(tokens[start_index - 2]);
+            new_value =  token_value.substr(std::stoi(left_index), std::stoi(right_index) - std::stoi(left_index));
+        } else {
+            Expression expression = Expression(left_tokens, "lemon", this->interpreter);
+            string index = expression.evaluate("lemon");
+
+            try {
+                std::stoi(index);
+            } catch (const std::invalid_argument& ia) {
+                error_out("invalid index");
+            }
+
+            string token_value = resolve(tokens[start_index - 2]);
+            new_value =  token_value.substr(std::stoi(index), 1);
+        }
+
+        // replace indexer call with return value
+        vector<Token> new_tokens = vector<Token>();
+
+        for (int i = 0; i < tokens.size(); i++) {
+            Token token = tokens[i];
+            // we want to also replace the token that we were indexing
+            if (i == start_index - 2) {
+                // replace indexer call with return value
+                new_tokens.push_back(Token(new_value, 0, 0, LITERAL_STRING));
+                i = end_index + 1;
+            } else {
+                new_tokens.push_back(token);
+            }
+        }
+
+        tokens = new_tokens;
     }
 
     // resolve function calls and replace with return value token
@@ -451,3 +610,4 @@ string Expression::resolve(Token token) {
 
     return "";
 }
+#pragma clang diagnostic pop

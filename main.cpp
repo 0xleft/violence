@@ -15,12 +15,10 @@ int handle_interactive_mode() {
 
         Variable output = parser.parse(tokens);
 
-        if (output.get_value() == "") {
-            printf(">>> ");
-            continue;
+        if (output.get_value() != "") {
+            printf("%s\n", output.get_value().c_str());
         }
 
-        printf("%s\n", output.get_value().c_str());
         printf(">>> ");
     }
 
@@ -31,6 +29,11 @@ int handle_file_mode(char *filename) {
     Reader reader(filename);
     string content = reader.get_content();
     reader.close();
+
+    if (content == "") {
+        printf("Error: File not found\n");
+        return 1;
+    }
 
     Lexer lexer(content);
     vector<Token> tokens = lexer.lex();

@@ -1,0 +1,9 @@
+word a : "hello world"
+
+word b : (size->a)
+
+(say->b)
+
+(say->a[0])
+
+(say->a[0:10])

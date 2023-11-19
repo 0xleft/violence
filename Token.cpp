@@ -60,6 +60,10 @@ string Token::get_type_string() {
             return "FUNCTION_END";
         case COMMENT:
             return "COMMENT";
+        case INDEXER_START:
+            return "INDEXER_START";
+        case INDEXER_END:
+            return "INDEXER_END";
         case WHITESPACE:
             return "WHITESPACE";
         case ERROR:
