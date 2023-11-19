@@ -38,6 +38,24 @@ private:
     }
 
 public:
+    bool can_load(string filename, string function_name) {
+        string filename_relative = "violence/" + filename + "_inline_c_violence.dll";
+        void *handle = dlopen(filename_relative.c_str(), RTLD_LAZY);
+        if (!handle) {
+            return false;
+        }
+
+        // get the function
+        void* func = dlsym(handle, function_name.c_str());
+        if (!func) {
+            return false;
+        }
+
+        dlclose(handle);
+
+        return true;
+    }
+
     string run(string filename, string function_name, vector<string> args) {
         // load the library
         string filename_relative = "violence/" + filename + "_inline_c_violence.dll";

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "Reader.h"
 #include "Lexer.h"
+#include "InlineCHandler.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnreachableCode"
@@ -530,9 +531,18 @@ string Expression::resolve_function(vector<Token> tokens) {
         if (this->interpreter->get_function_symlink(function_name).get_name() != "") {
             function_name = this->interpreter->get_function_symlink(function_name).get_original_name();
             function = this->interpreter->get_function(function_name);
+        } else if (this->interpreter->get_c_function(function_name).get_name() != "") {
+            printf("function name: %s\n", function_name.c_str());
+            CFunction c_function = this->interpreter->get_c_function(function_name);
+            InlineCHandler inline_c_handler;
+            bool can_load = inline_c_handler.can_load(c_function.get_name(), c_function.get_name());
+            if (!can_load) {
+                printf("%s was not compiled in parser exiting...\n", c_function.get_name().c_str());
+                exit(1);
+            }
+        } else {
+            error_out("function \"" + function_name + "\" does not exist");
         }
-
-        error_out("function \"" + function_name + "\" does not exist");
     }
 
     vector<string> arg_names = function.get_arg_names();

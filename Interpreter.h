@@ -161,15 +161,76 @@ public:
     }
 };
 
+class CFunction {
+private:
+    string filename;
+    string function_name;
+    string return_type;
+public:
+    CFunction(string filename, string function_name, string return_type) {
+        this->filename = filename;
+        this->function_name = function_name;
+        this->return_type = return_type;
+    }
+
+    string get_filename() {
+        return this->filename;
+    }
+
+    string get_name() {
+        return this->function_name;
+    }
+
+    string get_return_type() {
+        return this->return_type;
+    }
+};
+
 class Interpreter {
 private:
     Scope *global_scope;
     vector<Function> functions;
+    vector<CFunction> c_functions;
     vector<FunctionSymlink> function_symlinks;
     vector<string> imported;
     Interpreter *parent;
 public:
     Interpreter();
+
+    void add_c_function(CFunction c_function) {
+        // check if variable with this name exits
+        if (this->get_global_scope()->get_variable(c_function.get_name()).get_name() != "") {
+            cout << "variable with name " << c_function.get_name() << " already exists while trying to name function after it :(" << endl;
+            exit(1);
+        }
+
+        // check if function exists
+        if (this->get_c_function(c_function.get_name()).get_name() == "") {
+            this->c_functions.push_back(c_function);
+            return;
+        }
+
+        // if it does, replace it
+        for (int i = 0; i < this->c_functions.size(); i++) {
+            if (this->c_functions[i].get_name() == c_function.get_name()) {
+                this->c_functions[i] = c_function;
+                return;
+            }
+        }
+    }
+
+    CFunction get_c_function(string name) {
+        for (CFunction c_function : this->c_functions) {
+            if (c_function.get_name() == name) {
+                return c_function;
+            }
+        }
+        return CFunction("", "", "");
+    }
+
+    vector<CFunction> get_c_functions() {
+        return this->c_functions;
+    }
 
     void set_parent(Interpreter *parent) {
         this->parent = parent;

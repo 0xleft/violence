@@ -1,13 +1,9 @@
-word a : "hello world"
-
-word b : (size->a)
-
-(say->b)
-
-(say->a[0])
-
-(say->a[0:10])
-
+f-> test -> void
 [c]
-printf("test\n");
-[/c]
+void test() {
+    printf("test\n");
+}
+[/c] void test 0
+<-f
+
+(test)

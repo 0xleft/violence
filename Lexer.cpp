@@ -6,6 +6,7 @@
 #include "Reader.h"
 #include "utils.h"
 #include <iostream>
+#include "InlineCHandler.h"
 
 using namespace std;
 
@@ -36,7 +37,6 @@ vector<Token> Lexer::lex() {
         } else if (lines[i].substr(0, 4) == "[/c]") {
             is_inline_c = false;
             tokens.push_back(Token(inline_c, i, 0, INLINE_C));
-            inline_c = "";
             continue;
         }
 

@@ -3,6 +3,7 @@
 //
 
 #include "Parser.h"
+#include "InlineCHandler.h"
 
 Parser::Parser() {
     this->interpreter = new Interpreter();
@@ -48,9 +49,29 @@ Variable Parser::parse(vector<Token> tokens) {
                 } else if (line_tokens[i].get_type() == KEYWORD && line_tokens[i].get_value() == "<-f") {
                     break;
                 } else if (found_start) {
+                    if (line_tokens[i].get_type() == INLINE_C) {
+                        // if not compiled then compile
+                        InlineCHandler inline_c_handler;
+                        bool can_load = inline_c_handler.can_load(name, name);
+                        if (!can_load) {
+                            inline_c_handler.compile(name);
+                        }
+                        // add function to interpreter
+                        CFunction c_function = CFunction(name, name + string("_c"), return_type);
+                        this->interpreter->add_c_function(c_function);
+
+                        // insert function call tokens
+                        body.push_back(Token("(", 0, 0, FUNCTION_START));
+                        body.push_back(Token(name + string("_c"), 0, 0, IDENTIFIER));
+                        body.push_back(Token(")", 0, 0, FUNCTION_END));
+                        body.push_back(Token("EOL", 0, 0, EOL));
+                        continue;
+                    }
                     body.push_back(line_tokens[i]);
                 }
             }
+
+            // Token::print_tokens(body);
 
             Function function = Function(name, arg_names, body, return_type);
             this->interpreter->add_function(function);

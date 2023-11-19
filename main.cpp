@@ -2,16 +2,9 @@
 #include "Lexer.h"
 #include "Reader.h"
 #include "Parser.h"
+#include <signal.h>
 #include "InlineCHandler.h"
-
-void a() {
-    InlineCHandler handler;
-    handler.add_function("char *b() { return \"Hello World\"; }");
-    handler.compile("c");
-    vector<string> args = vector<string>();
-    string output = handler.run("c", "b", args);
-    printf("%s\n", output.c_str());
-}
+#include <cstring>
 
 int handle_interactive_mode() {
     // read from stdin
@@ -56,9 +49,19 @@ int handle_file_mode(char *filename) {
     return 0;
 }
 
+void handle_sigint(int sig) {
+    printf("\nCtrl-C pressed, exiting...\n");
+    exit(0);
+}
+
 int main(int argc, char *argv[]) {
 
-    a();
+    signal(SIGINT, handle_sigint);
+
+    if (strcmp(argv[1], "clean") == 0) {
+        InlineCHandler::clean();
+        return 0;
+    }
 
     if (argv[1] != NULL) {
         handle_file_mode(argv[1]);
