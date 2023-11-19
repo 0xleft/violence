@@ -187,6 +187,11 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
         parser.get_interpreter()->set_function_symlink(symlink);
     }
 
+    // c_functions
+    for (CFunction c_function : interpreter->get_c_functions()) {
+        parser.get_interpreter()->add_c_function(c_function);
+    }
+
     Variable output = parser.parse(this->body);
     return output;
 }
@@ -532,7 +537,6 @@ string Expression::resolve_function(vector<Token> tokens) {
             function_name = this->interpreter->get_function_symlink(function_name).get_original_name();
             function = this->interpreter->get_function(function_name);
         } else if (this->interpreter->get_c_function(function_name).get_name() != "") {
-            printf("function name: %s\n", function_name.c_str());
             CFunction c_function = this->interpreter->get_c_function(function_name);
             InlineCHandler inline_c_handler;
             bool can_load = inline_c_handler.can_load(c_function.get_name(), c_function.get_name());
@@ -540,6 +544,10 @@ string Expression::resolve_function(vector<Token> tokens) {
                 printf("%s was not compiled in parser exiting...\n", c_function.get_name().c_str());
                 exit(1);
             }
+            vector<string> args = {};
+            string output = inline_c_handler.run(c_function.get_name(), c_function.get_name(), args);
+            printf("output: %s\n", output.c_str());
+            return output;
         } else {
             error_out("function \"" + function_name + "\" does not exist");
         }

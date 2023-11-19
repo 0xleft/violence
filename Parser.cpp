@@ -52,12 +52,13 @@ Variable Parser::parse(vector<Token> tokens) {
                     if (line_tokens[i].get_type() == INLINE_C) {
                         // if not compiled then compile
                         InlineCHandler inline_c_handler;
+                        inline_c_handler.add_function(line_tokens[i].get_value());
                         bool can_load = inline_c_handler.can_load(name, name);
                         if (!can_load) {
                             inline_c_handler.compile(name);
                         }
                         // add function to interpreter
-                        CFunction c_function = CFunction(name, name + string("_c"), return_type);
+                        CFunction c_function = CFunction(name, name, return_type);
                         this->interpreter->add_c_function(c_function);
 
                         // insert function call tokens
@@ -70,8 +71,6 @@ Variable Parser::parse(vector<Token> tokens) {
                     body.push_back(line_tokens[i]);
                 }
             }
-
-            // Token::print_tokens(body);
 
             Function function = Function(name, arg_names, body, return_type);
             this->interpreter->add_function(function);

@@ -1,9 +1,12 @@
-f-> test -> void
+f-> test -> word
 [c]
-void test() {
-    printf("test\n");
+#include <stdio.h>
+char *test() {
+puts("test");
+return "aafefefaa aWorld";
 }
-[/c] void test 0
+[/c]
 <-f
 
-(test)
+word a : (test)
+(say->a)

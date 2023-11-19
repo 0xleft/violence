@@ -58,12 +58,14 @@ int main(int argc, char *argv[]) {
 
     signal(SIGINT, handle_sigint);
 
-    if (strcmp(argv[1], "clean") == 0) {
+    // if argv[2] is --clean
+    if (argc == 3 && strcmp(argv[2], "--clean") == 0) {
+        printf("Cleaning...\n");
         InlineCHandler::clean();
-        return 0;
     }
 
-    if (argv[1] != NULL) {
+    // and not equal to --
+    if (argv[1] != NULL && strcmp(argv[1], "--") != 0) {
         handle_file_mode(argv[1]);
     } else {
         handle_interactive_mode();
