@@ -1,13 +1,32 @@
-f-> sqrt -> number -> lemon
-if number == 0
-return 0
-
-if number > 0
-return 1
-
-
+f-> abs -> number -> lemon
+    ~ nice hack :)
+    word letter : number[0]
+    if letter == "-"
+        lemon number : 1 - 2 * number
+    return number
 <-f
 
-lemon a : (sqrt->1)
-word b : a
-(say->b)
+f-> sqrt -> number -> lemon
+    if number == 0
+        return 0
+
+    if number < 0
+        (say-> "sqrt: negative number")
+    if number < 0
+        (exit)
+
+    lemon guess : number / 2
+    lemon output : (sqrt_helper -> number -> guess)
+<-f
+
+f-> sqrt_helper -> number -> guess -> lemon
+    lemon new_guess : number / guess + guess / 2
+    lemon diff : guess - new_guess
+    lemon abs_diff : (abs->diff)
+
+    ~ accuracy
+    if abs_diff > 0.0001
+        return (sqrt_helper->number->new_guess)
+
+    return new_guess
+<-f

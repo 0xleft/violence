@@ -445,7 +445,7 @@ string Expression::evaluate(string return_type) {
 
                 // check if parsable to int or float
                 try {
-                    std::stoi(final_value);
+                    std::stof(final_value);
                 } catch (const std::invalid_argument& ia) {
                     error_out("invalid number");
                 }
@@ -488,25 +488,25 @@ string Expression::evaluate(string return_type) {
                         final_value = "bad";
                     }
                 } else if (value == ">") {
-                    if (std::stoi(final_value) > std::stoi(next_value)) {
+                    if (std::stof(final_value) > std::stof(next_value)) {
                         final_value = "good";
                     } else {
                         final_value = "bad";
                     }
                 } else if (value == "<") {
-                    if (std::stoi(final_value) < std::stoi(next_value)) {
+                    if (std::stof(final_value) < std::stof(next_value)) {
                         final_value = "good";
                     } else {
                         final_value = "bad";
                     }
                 } else if (value == ">=") {
-                    if (std::stoi(final_value) >= std::stoi(next_value)) {
+                    if (std::stof(final_value) >= std::stof(next_value)) {
                         final_value = "good";
                     } else {
                         final_value = "bad";
                     }
                 } else if (value == "<=") {
-                    if (std::stoi(final_value) <= std::stoi(next_value)) {
+                    if (std::stof(final_value) <= std::stof(next_value)) {
                         final_value = "good";
                     } else {
                         final_value = "bad";

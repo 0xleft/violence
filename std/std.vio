@@ -1,0 +1,4 @@
+f-> print_s -> number -> void
+word number : number
+(say->number)
+<-f
