@@ -20,7 +20,6 @@ jobs:
           ls -la
           sudo apt update
           sudo apt install -y build-essential cmake
-          sudo apt install -y mingw-w64
           chmod +x build-all.sh
           chmod +x build.sh
           ./build-all.sh release

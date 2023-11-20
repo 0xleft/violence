@@ -18,7 +18,7 @@ if ! [ -x "$(command -v gcc)" ]; then
   exit 1
 fi
 
-# wget https://github.com/0xleft/violence/releases/download/v1.0.8/violence_linux
-wget https://github.com/0xleft/violence/releases/download/v1.0.8/violence_linux -O /usr/bin/violence
+# wget https://github.com/0xleft/violence/releases/download/v1.0.9/violence_linux
+wget https://github.com/0xleft/violence/releases/download/v1.0.9/violence_linux -O /usr/bin/violence
 chmod +x /usr/bin/violence
 echo "Violence installed in /usr/bin/violence"
