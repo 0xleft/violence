@@ -85,6 +85,9 @@ Variable Parser::parse(vector<Token> tokens) {
         } else if (token.get_type() == EOL && !skipping) {
             variable = parse_line(line_tokens, token.get_line());
             line_tokens.clear();
+            if (variable.get_type() == "return") {
+                return variable;
+            }
             if (variable.get_type() == "skip") {
                 skipping = true;
             }
@@ -192,6 +195,28 @@ Variable Parser::parse_line(vector<Token> line_tokens, int line) {
             } else {
                 return Variable("", "execute", "");
             }
+        }
+
+        if (line_tokens[0].get_value() == "return") {
+            // check if expression is true
+            vector<Token> expression_tokens;
+
+            for (int i = 1; i < line_tokens.size(); i++) {
+                if (line_tokens[i].get_type() == EOL) {
+                    break;
+                } else {
+                    expression_tokens.push_back(line_tokens[i]);
+                }
+            }
+
+            if (expression_tokens.size() == 0) {
+                error_out("return statement must have an expression");
+            }
+
+            Expression expression = Expression(expression_tokens, "word", this->interpreter);
+            string value = expression.evaluate("word");
+
+            return Variable("", "return", value);
         }
     } else if (line_tokens[0].get_type() == FUNCTION_START) {
         Expression expression = Expression(line_tokens, "void", this->interpreter);

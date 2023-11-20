@@ -1,0 +1,13 @@
+f-> sqrt -> number -> lemon
+if number == 0
+return 0
+
+if number > 0
+return 1
+
+
+<-f
+
+lemon a : (sqrt->1)
+word b : a
+(say->b)

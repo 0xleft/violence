@@ -106,6 +106,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
                   || token_value == "f-" && current_char == '>'
                   || token_value == "f" && current_char == '-'
                   || token_value == "<-" && current_char == 'f'
+                  || token_value == "retur" && current_char == 'n'
                  ) && state != LITERAL_STRING) {
 
             state = KEYWORD;
