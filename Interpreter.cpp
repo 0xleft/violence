@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "Reader.h"
 #include "Lexer.h"
+#include "InlineCHandler.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnreachableCode"
@@ -184,6 +185,11 @@ Variable Function::evaluate(vector<Variable> args, vector<Function> functions, v
     // symlinks
     for (FunctionSymlink symlink : symlinks) {
         parser.get_interpreter()->set_function_symlink(symlink);
+    }
+
+    // c_functions
+    for (CFunction c_function : interpreter->get_c_functions()) {
+        parser.get_interpreter()->add_c_function(c_function);
     }
 
     Variable output = parser.parse(this->body);
@@ -439,7 +445,7 @@ string Expression::evaluate(string return_type) {
 
                 // check if parsable to int or float
                 try {
-                    std::stoi(final_value);
+                    std::stof(final_value);
                 } catch (const std::invalid_argument& ia) {
                     error_out("invalid number");
                 }
@@ -482,25 +488,25 @@ string Expression::evaluate(string return_type) {
                         final_value = "bad";
                     }
                 } else if (value == ">") {
-                    if (std::stoi(final_value) > std::stoi(next_value)) {
+                    if (std::stof(final_value) > std::stof(next_value)) {
                         final_value = "good";
                     } else {
                         final_value = "bad";
                     }
                 } else if (value == "<") {
-                    if (std::stoi(final_value) < std::stoi(next_value)) {
+                    if (std::stof(final_value) < std::stof(next_value)) {
                         final_value = "good";
                     } else {
                         final_value = "bad";
                     }
                 } else if (value == ">=") {
-                    if (std::stoi(final_value) >= std::stoi(next_value)) {
+                    if (std::stof(final_value) >= std::stof(next_value)) {
                         final_value = "good";
                     } else {
                         final_value = "bad";
                     }
                 } else if (value == "<=") {
-                    if (std::stoi(final_value) <= std::stoi(next_value)) {
+                    if (std::stof(final_value) <= std::stof(next_value)) {
                         final_value = "good";
                     } else {
                         final_value = "bad";
@@ -530,9 +536,30 @@ string Expression::resolve_function(vector<Token> tokens) {
         if (this->interpreter->get_function_symlink(function_name).get_name() != "") {
             function_name = this->interpreter->get_function_symlink(function_name).get_original_name();
             function = this->interpreter->get_function(function_name);
-        }
+        } else if (this->interpreter->get_c_function(function_name).get_name() != "") {
+            CFunction c_function = this->interpreter->get_c_function(function_name);
+            InlineCHandler inline_c_handler;
+            bool can_load = inline_c_handler.can_load(c_function.get_name(), c_function.get_name());
+            if (!can_load) {
+                printf("%s was not compiled in parser exiting...\n", c_function.get_name().c_str());
+                exit(1);
+            }
 
-        error_out("function \"" + function_name + "\" does not exist");
+            // get args
+            vector<string> args = vector<string>();
+            for (int i = 1; i < tokens.size(); i++) {
+                Token token = tokens[i];
+                if (token.get_type() == OPERATOR && token.get_value() == "->") {
+                    string arg_value = resolve(tokens[i + 1]);
+                    args.push_back(arg_value);
+                }
+            }
+
+            string output = inline_c_handler.run(c_function.get_name(), c_function.get_name(), args);
+            return output;
+        } else {
+            error_out("function \"" + function_name + "\" does not exist");
+        }
     }
 
     vector<string> arg_names = function.get_arg_names();

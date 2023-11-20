@@ -1,0 +1,73 @@
+(get->"std/math.vio")
+(get->"std/std.vio")
+
+f-> print_welcome -> void
+    (say->"Calculator 1000")
+    (say->"1. Add")
+    (say->"2. Subtract")
+    (say->"3. Multiply")
+    (say->"4. Sqrt")
+    (say->"5. Exit")
+<-f
+
+~ loop
+f-> main_loop -> printed -> void
+    if printed == 0
+    (print_welcome)
+
+    lemon choice : (ask->"Enter your choice: ")
+    ~ + 0 will make it throw an error if the user enters a non-number
+    lemon test : choice + 0
+
+    if choice == 5
+        (exit)
+
+    if choice == 1
+        (add)
+
+    if choice == 2
+        (subtract)
+
+    if choice == 3
+        (multiply)
+
+    if choice == 4
+        (sqrt_f)
+
+    (main_loop -> 1)
+<-f
+
+f-> add -> void
+    word a : (ask->"add->")
+    word b : (ask->"+ ")
+    lemon test : a + 0
+    lemon test : b + 0
+    lemon c : a + b
+    (print_s->c)
+<-f
+
+f-> subtract -> void
+    word a : (ask->"subtract->")
+    word b : (ask->"- ")
+    lemon test : a + 0
+    lemon test : b + 0
+    lemon c : a - b
+    (print_s->c)
+<-f
+
+f-> multiply -> void
+    word a : (ask->"multiply->")
+    word b : (ask->"* ")
+    lemon test : a + 0
+    lemon test : b + 0
+    lemon c : a * b
+    (print_s->c)
+<-f
+
+f-> sqrt_f -> void
+    word a : (ask->"sqrt->")
+    lemon test : a + 0
+    (print_s->(sqrt->a))
+<-f
+
+(main_loop -> 0)

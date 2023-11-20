@@ -2,6 +2,9 @@
 #include "Lexer.h"
 #include "Reader.h"
 #include "Parser.h"
+#include <signal.h>
+#include "InlineCHandler.h"
+#include <cstring>
 
 int handle_interactive_mode() {
     // read from stdin
@@ -46,9 +49,23 @@ int handle_file_mode(char *filename) {
     return 0;
 }
 
+void handle_sigint(int sig) {
+    printf("\nCtrl-C pressed, exiting...\n");
+    exit(0);
+}
+
 int main(int argc, char *argv[]) {
 
-    if (argv[1] != NULL) {
+    signal(SIGINT, handle_sigint);
+
+    // if argv[2] is --clean
+    if (argc == 3 && strcmp(argv[2], "--clean") == 0) {
+        printf("Cleaning...\n");
+        InlineCHandler::clean();
+    }
+
+    // and not equal to --
+    if (argv[1] != NULL && strcmp(argv[1], "--") != 0) {
         handle_file_mode(argv[1]);
     } else {
         handle_interactive_mode();

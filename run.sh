@@ -9,4 +9,4 @@ if [ "$1" = "" ]; then
 fi
 
 ./build.sh $1
-bin/$TARGET_NAME $2
+bin/$TARGET_NAME $2 $3

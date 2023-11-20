@@ -6,6 +6,7 @@
 #include "Reader.h"
 #include "utils.h"
 #include <iostream>
+#include "InlineCHandler.h"
 
 using namespace std;
 
@@ -17,8 +18,11 @@ vector<Token> Lexer::lex() {
     // split the file into lines
     vector<string> lines = split(this->content, "\n");
 
+    bool is_inline_c = false;
+
     // lex each line
     vector<Token> tokens;
+    string inline_c = "";
     for (int i = 0; i < lines.size(); i++) {
         if (lines[i].size() == 0) {
             continue;
@@ -26,6 +30,21 @@ vector<Token> Lexer::lex() {
         if (lines[i][lines[i].size() - 1] == '\r') {
             lines[i].erase(lines[i].size() - 1);
         }
+
+        if (lines[i].substr(0, 3) == "[c]") {
+            is_inline_c = true;
+            continue;
+        } else if (lines[i].substr(0, 4) == "[/c]") {
+            is_inline_c = false;
+            tokens.push_back(Token(inline_c, i, 0, INLINE_C));
+            continue;
+        }
+
+        if (is_inline_c) {
+            inline_c += lines[i] + "\n";
+            continue;
+        }
+
         // last letter
         if (lines[i][lines[i].size() - 1] != '~') {
             // dont really like this it should automatically add it
@@ -87,6 +106,7 @@ vector<Token> Lexer::lex_line(string line_content, int line) {
                   || token_value == "f-" && current_char == '>'
                   || token_value == "f" && current_char == '-'
                   || token_value == "<-" && current_char == 'f'
+                  || token_value == "retur" && current_char == 'n'
                  ) && state != LITERAL_STRING) {
 
             state = KEYWORD;

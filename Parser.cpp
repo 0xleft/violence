@@ -3,6 +3,7 @@
 //
 
 #include "Parser.h"
+#include "InlineCHandler.h"
 
 Parser::Parser() {
     this->interpreter = new Interpreter();
@@ -14,6 +15,7 @@ Variable Parser::parse(vector<Token> tokens) {
 
     bool is_function = false;
     bool skipping = false;
+    bool is_inline_c = false;
 
     for (Token token : tokens) {
 
@@ -48,8 +50,28 @@ Variable Parser::parse(vector<Token> tokens) {
                 } else if (line_tokens[i].get_type() == KEYWORD && line_tokens[i].get_value() == "<-f") {
                     break;
                 } else if (found_start) {
+                    if (line_tokens[i].get_type() == INLINE_C) {
+                        is_inline_c = true;
+                        // if not compiled then compile
+                        InlineCHandler inline_c_handler;
+                        inline_c_handler.add_function(line_tokens[i].get_value());
+                        bool can_load = inline_c_handler.can_load(name, name);
+                        if (!can_load) {
+                            inline_c_handler.compile(name);
+                        }
+                        // add function to interpreter
+                        CFunction c_function = CFunction(name, name, return_type);
+                        this->interpreter->add_c_function(c_function);
+                        continue;
+                    }
                     body.push_back(line_tokens[i]);
                 }
+            }
+
+            if (is_inline_c) {
+                is_inline_c = false;
+                is_function = false;
+                continue;
             }
 
             Function function = Function(name, arg_names, body, return_type);
@@ -63,6 +85,9 @@ Variable Parser::parse(vector<Token> tokens) {
         } else if (token.get_type() == EOL && !skipping) {
             variable = parse_line(line_tokens, token.get_line());
             line_tokens.clear();
+            if (variable.get_type() == "return") {
+                return variable;
+            }
             if (variable.get_type() == "skip") {
                 skipping = true;
             }
@@ -73,6 +98,7 @@ Variable Parser::parse(vector<Token> tokens) {
             line_tokens.push_back(token);
         }
     }
+
 
     return variable;
 }
@@ -169,6 +195,28 @@ Variable Parser::parse_line(vector<Token> line_tokens, int line) {
             } else {
                 return Variable("", "execute", "");
             }
+        }
+
+        if (line_tokens[0].get_value() == "return") {
+            // check if expression is true
+            vector<Token> expression_tokens;
+
+            for (int i = 1; i < line_tokens.size(); i++) {
+                if (line_tokens[i].get_type() == EOL) {
+                    break;
+                } else {
+                    expression_tokens.push_back(line_tokens[i]);
+                }
+            }
+
+            if (expression_tokens.size() == 0) {
+                error_out("return statement must have an expression");
+            }
+
+            Expression expression = Expression(expression_tokens, "word", this->interpreter);
+            string value = expression.evaluate("word");
+
+            return Variable("", "return", value);
         }
     } else if (line_tokens[0].get_type() == FUNCTION_START) {
         Expression expression = Expression(line_tokens, "void", this->interpreter);

@@ -1,9 +1,20 @@
-word a : "hello world"
+f-> testa -> word
+(say->"test")
+<-f
 
-word b : (size->a)
+f-> test -> word
+[c]
+#include <stdio.h>
+char *test() {
+puts("test");
+return "aafefefaa aWorld";
+}
+[/c]
+<-f
 
-(say->b)
+word a : (test)
+f-> w -> s -> word
+word s : s
+<-f
 
-(say->a[0])
-
-(say->a[0:10])
+(say->(w -> (size -> a)))

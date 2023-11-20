@@ -21,6 +21,7 @@ enum TokenType {
     FUNCTION_END,
     INDEXER_START,
     INDEXER_END,
+    INLINE_C,
     COMMENT,
     WHITESPACE,
     EOL,
